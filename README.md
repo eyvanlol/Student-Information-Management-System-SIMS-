@@ -1,2 +1,4 @@
 # Student-Information-Management-System-SIMS-
-groupassignment
+
+project namespace; StudentManagementSystem 
+database name; SIMS_DB
