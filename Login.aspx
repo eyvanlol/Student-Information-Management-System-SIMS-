@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="StudentManagementSystem.Login" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="StudentManagementSystem.Login" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -104,7 +104,7 @@
                     </div>
                     <h1>Welcome Back!</h1>
                     <p>Access your personalized dashboard to manage academic programs, courses, student records, and more.</p>
-                </div> 
+                </div>
                 <div class="col-md-7 login-right">
                     <h2>Sign In</h2>
                     <p class="subtitle">Enter your email and password</p>
