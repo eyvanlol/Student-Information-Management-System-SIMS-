@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace StudentManagementSystem
 {
@@ -16,40 +16,27 @@ namespace StudentManagementSystem
         {
             string email = txtEmail.Text.Trim().ToLower();
             string password = txtPassword.Text;
-            string role = hdnRole.Value;
 
-            // Hardcoded credentials
-            bool isValid = false;
-            string redirectPage = "";
-
-            if (role == "admin" && email == "admin@college.edu" && password == "admin123")
+            if (email == "admin@college.edu" && password == "admin123")
             {
-                isValid = true;
-                redirectPage = "AdminDashboard.aspx";
                 Session["UserName"] = "Head of Programme";
                 Session["UserRole"] = "Admin";
                 Session["UserEmail"] = email;
+                Response.Redirect("AdminDashboard.aspx");
             }
-            else if (role == "lecturer" && email == "lecturer@college.edu" && password == "lecturer123")
+            else if (email == "lecturer@college.edu" && password == "lecturer123")
             {
-                isValid = true;
-                redirectPage = "LecturerDashboard.aspx";
                 Session["UserName"] = "Lecturer";
                 Session["UserRole"] = "Lecturer";
                 Session["UserEmail"] = email;
+                Response.Redirect("LecturerDashboard.aspx");
             }
-            else if (role == "student" && email == "student@college.edu" && password == "student123")
+            else if (email == "student@college.edu" && password == "student123")
             {
-                isValid = true;
-                redirectPage = "StudentDashboard.aspx";
                 Session["UserName"] = "Eyvan";
                 Session["UserRole"] = "Student";
                 Session["UserEmail"] = email;
-            }
-
-            if (isValid)
-            {
-                Response.Redirect(redirectPage);
+                Response.Redirect("StudentDashboard.aspx");
             }
             else
             {
