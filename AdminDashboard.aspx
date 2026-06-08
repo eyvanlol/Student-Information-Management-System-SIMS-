@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminDashboard.aspx.cs" Inherits="StudentManagementSystem.AdminDashboard" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminDashboard.aspx.cs" Inherits="StudentManagementSystem.AdminDashboard" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -164,7 +164,7 @@
                     <a href="AdminDashboard.aspx" class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a>
+                    <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
@@ -227,7 +227,7 @@
                         <div class="stat-card">
                             <div class="stat-icon blue"><i class="fas fa-users"></i></div>
                             <div class="stat-info">
-                                <h3>1,245</h3>
+                                <h3><asp:Label ID="lblStudents" runat="server" Text="0"></asp:Label></h3>
                                 <p>Total Students</p>
                                 <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+12% from last year</div>
                             </div>
@@ -237,7 +237,7 @@
                         <div class="stat-card">
                             <div class="stat-icon green"><i class="fas fa-user-tie"></i></div>
                             <div class="stat-info">
-                                <h3>48</h3>
+                                <h3><asp:Label ID="lblLecturers" runat="server" Text="0"></asp:Label></h3>
                                 <p>Total Lecturers</p>
                                 <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+3 new this month</div>
                             </div>
@@ -247,7 +247,7 @@
                         <div class="stat-card">
                             <div class="stat-icon orange"><i class="fas fa-book"></i></div>
                             <div class="stat-info">
-                                <h3>86</h3>
+                                <h3><asp:Label ID="lblCourses" runat="server" Text="0"></asp:Label></h3>
                                 <p>Active Courses</p>
                                 <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+5 this semester</div>
                             </div>
@@ -257,7 +257,7 @@
                         <div class="stat-card">
                             <div class="stat-icon red"><i class="fas fa-clipboard-list"></i></div>
                             <div class="stat-info">
-                                <h3>12</h3>
+                                <h3><asp:Label ID="lblProgCount" runat="server" Text="0"></asp:Label></h3>
                                 <p>Programmes</p>
                                 <div class="stat-trend down"><i class="fas fa-arrow-down me-1"></i>-1 discontinued</div>
                             </div>
@@ -311,7 +311,7 @@
                                 <h5><i class="fas fa-bolt me-2 text-warning"></i>Quick Actions</h5>
                             </div>
                             <div class="card-body">
-                                <a href="#" class="quick-action">
+                                <a href="ManageProgrammes.aspx" class="quick-action">
                                     <i class="fas fa-plus" style="background:#d4edda;color:#155724;"></i>
                                     <div><h6>Add New Programme</h6><small>Create a new academic programme</small></div>
                                 </a>
