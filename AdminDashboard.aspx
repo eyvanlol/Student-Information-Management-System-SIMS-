@@ -167,10 +167,13 @@
                     <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+                    <a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-user-tie"></i><span>Lecturers</span></a>
+                    <a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Enrol Student</span></a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link"><i class="fas fa-users"></i><span>Students</span></a>
@@ -315,11 +318,11 @@
                                     <i class="fas fa-plus" style="background:#d4edda;color:#155724;"></i>
                                     <div><h6>Add New Programme</h6><small>Create a new academic programme</small></div>
                                 </a>
-                                <a href="#" class="quick-action">
+                                <a href="RegisterLecturer.aspx" class="quick-action">
                                     <i class="fas fa-user-plus" style="background:#d1ecf1;color:#0c5460;"></i>
                                     <div><h6>Register Lecturer</h6><small>Add new lecturer to system</small></div>
                                 </a>
-                                <a href="#" class="quick-action">
+                                <a href="RegisterStudent.aspx" class="quick-action">
                                     <i class="fas fa-user-graduate" style="background:#fff3cd;color:#856404;"></i>
                                     <div><h6>Enrol Student</h6><small>Process new student admission</small></div>
                                 </a>
