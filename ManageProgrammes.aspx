@@ -94,8 +94,9 @@
             <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link active"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-tie"></i><span>Lecturers</span></a></div>
+                <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
+                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
+                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Enrol Student</span></a></div>
                 <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-users"></i><span>Students</span></a></div>
                 <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-bar"></i><span>Reports</span></a></div>
