@@ -50,7 +50,7 @@ namespace StudentManagementSystem
 
             string name = txtName.Text.Trim();
             string email = txtEmail.Text.Trim().ToLower();
-            string password = txtPassword.Text;
+            string password = Login.HashPassword(txtPassword.Text);
 
             string sql = "INSERT INTO LECTURER (name, email, password) VALUES (@name, @email, @password)";
 
