@@ -72,7 +72,7 @@ namespace StudentManagementSystem
 
             string name = txtName.Text.Trim();
             string email = txtEmail.Text.Trim().ToLower();
-            string password = txtPassword.Text;
+            string password = Login.HashPassword(txtPassword.Text);
             string programmeID = ddlProgramme.SelectedValue;
 
             if (string.IsNullOrEmpty(programmeID))
