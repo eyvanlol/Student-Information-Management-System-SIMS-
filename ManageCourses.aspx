@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageCourses.aspx.cs" Inherits="StudentManagementSystem.ManageCourses" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageCourses.aspx.cs" Inherits="StudentManagementSystem.ManageCourses" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -125,48 +125,42 @@
         <!-- Sidebar - EXACT SAME as AdminDashboard -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <div style="width:70px;height:70px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;">
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
                 <small>Administrator</small>
             </div>
-
             <nav class="mt-3">
+            
                 <div class="nav-item">
                     <a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a>
+                    <a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="ManageCourses.aspx" class="nav-link active"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+                    <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Manage Programmes</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a>
+                    <a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Manage Courses</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Enrol Student</span></a>
+                    <a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Manage Enrolment</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-users"></i><span>Students</span></a>
+                    <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i><span>Student Statistics</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a>
+                    <a href="#" class="nav-link"><i class="fas fa-file-export"></i><span>Reports</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                    <a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a>
+                    <a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
                 </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
-                </div>
-            </nav>
+        </nav>
 
             <div class="sidebar-footer">
                 <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
