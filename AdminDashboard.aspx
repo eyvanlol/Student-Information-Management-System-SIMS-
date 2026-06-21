@@ -164,7 +164,7 @@
                     <a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a>
                 </div>
                 <div class="nav-item">
-                    <a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                    <ahref="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
                 </div>
                 <div class="nav-item">
                     <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Manage Programmes</span></a>
