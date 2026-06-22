@@ -33,6 +33,17 @@ namespace StudentManagementSystem
                 return;
             }
 
+            // First-time students must verify their OTP before the account works.
+            if (user.Role == "Student" && !IsStudentActivated(user.UserID))
+            {
+                Session["PendingOtpStudentID"] = user.UserID;
+                Session["PendingOtpName"] = user.Name;
+                Session["PendingOtpEmail"] = email;                       // college login email
+                Session["PendingOtpPersonal"] = GetStudentPersonalEmail(user.UserID);
+                Response.Redirect("VerifyOtp.aspx");
+                return;
+            }
+
             Session["UserID"] = user.UserID;
             Session["UserName"] = user.Name;
             Session["UserEmail"] = email;
@@ -115,6 +126,40 @@ namespace StudentManagementSystem
             // checks hashed passwords
             string hashedInput = HashPassword(inputPassword);
             return hashedInput == dbPassword;
+        }
+
+        // Returns false only when the student row exists AND isActivated = 0.
+        // If the column is missing (PATCH 10 not yet run) we treat as activated
+        // so nobody is locked out by accident.
+        private bool IsStudentActivated(int studentID)
+        {
+            try
+            {
+                object o = DbHelper.ExecuteScalar(
+                    "SELECT isActivated FROM STUDENT WHERE studentID = @id",
+                    new SqlParameter("@id", studentID));
+                if (o == null || o == DBNull.Value) return true;
+                return Convert.ToBoolean(o);
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        private string GetStudentPersonalEmail(int studentID)
+        {
+            try
+            {
+                object o = DbHelper.ExecuteScalar(
+                    "SELECT personalEmail FROM STUDENT WHERE studentID = @id",
+                    new SqlParameter("@id", studentID));
+                return (o == null || o == DBNull.Value) ? "" : o.ToString();
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         public static string HashPassword(string password)

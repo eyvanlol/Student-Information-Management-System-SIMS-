@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 
 namespace StudentManagementSystem
 {
@@ -14,6 +15,20 @@ namespace StudentManagementSystem
             {
                 lblUserName.Text = Session["UserName"].ToString();
                 lblTopUserName.Text = Session["UserName"].ToString();
+
+                try
+                {
+                    object o = DbHelper.ExecuteScalar(
+                        "SELECT lecturerTitle FROM LECTURER WHERE lecturerID = @id",
+                        new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
+                    string t = (o == null || o == DBNull.Value) ? "" : o.ToString();
+                    if (!string.IsNullOrEmpty(t))
+                        lblRoleIdentity.Text = t;
+                }
+                catch
+                {
+                    // lecturerTitle column not present yet (PATCH 11) -> keep default.
+                }
             }
         }
 

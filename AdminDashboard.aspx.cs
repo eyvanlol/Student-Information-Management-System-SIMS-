@@ -15,11 +15,50 @@ namespace StudentManagementSystem
             {
                 lblUserName.Text = Session["UserName"].ToString();
                 lblTopUserName.Text = Session["UserName"].ToString();
+                LoadIdentity();
 
                 if (!IsPostBack)
                 {
                     LoadStats();
                 }
+            }
+        }
+
+        private void LoadIdentity()
+        {
+            try
+            {
+                object o = DbHelper.ExecuteScalar(
+                    "SELECT headOf FROM HOP_ADMIN WHERE adminID = @id",
+                    new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
+                string h = (o == null || o == DBNull.Value) ? "" : o.ToString();
+                if (!string.IsNullOrEmpty(h))
+                    lblRoleIdentity.Text = "Head of Programme, " + h;
+                if (!IsPostBack)
+                    txtHeadOf.Text = h;
+            }
+            catch
+            {
+                // headOf column not present yet (PATCH 11) -> keep default label.
+            }
+        }
+
+        protected void btnSaveHeadOf_Click(object sender, EventArgs e)
+        {
+            string h = txtHeadOf.Text.Trim();
+            try
+            {
+                DbHelper.ExecuteNonQuery(
+                    "UPDATE HOP_ADMIN SET headOf = @h WHERE adminID = @id",
+                    new SqlParameter("@h", string.IsNullOrEmpty(h) ? (object)DBNull.Value : h),
+                    new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
+
+                lblRoleIdentity.Text = string.IsNullOrEmpty(h) ? "Head of Programme" : "Head of Programme, " + h;
+                lblHeadOfMsg.Text = "<span class='text-success'><i class='fas fa-check-circle me-1'></i>Saved.</span>";
+            }
+            catch (Exception ex)
+            {
+                lblHeadOfMsg.Text = "<span class='text-danger'>Could not save: " + ex.Message + "</span>";
             }
         }
 

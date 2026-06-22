@@ -101,6 +101,12 @@
     <Content Include="ManageUsers.aspx" />
     <Content Include="RegisterLecturer.aspx" />
     <Content Include="RegisterStudent.aspx" />
+    <Content Include="VerifyOtp.aspx" />
+    <Content Include="LecturerAttendance.aspx" />
+    <Content Include="LecturerProfile.aspx" />
+    <Content Include="LecturerCourses.aspx" />
+    <Content Include="StudentAttendance.aspx" />
+    <Content Include="StudentStatistics.aspx" />
     <Content Include="StudentDashboard.aspx" />
     <Content Include="StudentNotifications.aspx" />
     <Content Include="StudentResult.aspx" />
@@ -130,6 +136,7 @@
       <DependentUpon>Announcements.aspx</DependentUpon>
     </Compile>
     <Compile Include="DbHelper.cs" />
+    <Compile Include="EmailHelper.cs" />
     <Compile Include="LecturerAnnouncements.aspx.cs">
       <DependentUpon>LecturerAnnouncements.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -201,6 +208,48 @@
     </Compile>
     <Compile Include="RegisterStudent.aspx.designer.cs">
       <DependentUpon>RegisterStudent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="VerifyOtp.aspx.cs">
+      <DependentUpon>VerifyOtp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="VerifyOtp.aspx.designer.cs">
+      <DependentUpon>VerifyOtp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LecturerAttendance.aspx.cs">
+      <DependentUpon>LecturerAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LecturerAttendance.aspx.designer.cs">
+      <DependentUpon>LecturerAttendance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LecturerProfile.aspx.cs">
+      <DependentUpon>LecturerProfile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LecturerProfile.aspx.designer.cs">
+      <DependentUpon>LecturerProfile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LecturerCourses.aspx.cs">
+      <DependentUpon>LecturerCourses.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LecturerCourses.aspx.designer.cs">
+      <DependentUpon>LecturerCourses.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="StudentAttendance.aspx.cs">
+      <DependentUpon>StudentAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="StudentAttendance.aspx.designer.cs">
+      <DependentUpon>StudentAttendance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="StudentStatistics.aspx.cs">
+      <DependentUpon>StudentStatistics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="StudentStatistics.aspx.designer.cs">
+      <DependentUpon>StudentStatistics.aspx</DependentUpon>
     </Compile>
     <Compile Include="StudentDashboard.aspx.cs">
       <DependentUpon>StudentDashboard.aspx</DependentUpon>

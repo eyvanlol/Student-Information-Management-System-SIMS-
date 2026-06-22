@@ -135,16 +135,17 @@
             <small>Administrator</small>
         </div>
         <nav class="mt-3">
-            <div class="nav-item"><a href="AdminDashboard.aspx"   class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-            <div class="nav-item"><a href="RegisterStudent.aspx"  class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
-            <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Manage Programmes</span></a></div>
-            <div class="nav-item"><a href="ManageCourses.aspx"    class="nav-link"><i class="fas fa-graduation-cap"></i><span>Manage Courses</span></a></div>
-            <div class="nav-item"><a href="ManageEnrolment.aspx"  class="nav-link"><i class="fas fa-clipboard-check"></i><span>Manage Enrolment</span></a></div>
-            <div class="nav-item"><a href="#"                     class="nav-link"><i class="fas fa-chart-bar"></i><span>Student Statistics</span></a></div>
-            <div class="nav-item"><a href="#"                     class="nav-link"><i class="fas fa-file-export"></i><span>Reports</span></a></div>
-            <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
-            <div class="nav-item"><a href="Announcements.aspx"    class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-        </nav>
+                <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
+                <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
+                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
+                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
+                <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
+                <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link active"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
+                <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
+                <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
+                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
+            </nav>
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
                 <i class="fas fa-sign-out-alt"></i><span>Logout</span>
@@ -161,12 +162,11 @@
                         <i class="fas fa-bell text-muted"></i>
                         <span class="badge">5</span>
                     </div>
-                    <div class="user-dropdown">
+                    <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                            <i class="fas fa-user-shield"></i>
+                            <i class="fas fa-user"></i>
                         </div>
-                        <span><asp:Label ID="lblTopUserName" runat="server" Text="Head of Programme"></asp:Label></span>
-                        <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
+                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
                     </div>
                 </div>
             </div>

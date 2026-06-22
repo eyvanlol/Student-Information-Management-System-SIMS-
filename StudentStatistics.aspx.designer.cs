@@ -11,7 +11,7 @@ namespace StudentManagementSystem
 {
 
 
-    public partial class StudentAttendance
+    public partial class StudentStatistics
     {
 
         /// <summary>
@@ -51,30 +51,39 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.WebControls.Label lblTopUserName;
 
         /// <summary>
-        /// pnlWarning control.
+        /// hiddenGpaLabels control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlWarning;
+        protected global::System.Web.UI.WebControls.HiddenField hiddenGpaLabels;
 
         /// <summary>
-        /// litWarning control.
+        /// hiddenGpaData control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litWarning;
+        protected global::System.Web.UI.WebControls.HiddenField hiddenGpaData;
 
         /// <summary>
-        /// gvAttendance control.
+        /// hiddenAttendanceLabels control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvAttendance;
+        protected global::System.Web.UI.WebControls.HiddenField hiddenAttendanceLabels;
+
+        /// <summary>
+        /// hiddenAttendanceData control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hiddenAttendanceData;
     }
 }

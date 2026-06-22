@@ -137,7 +137,7 @@
                     <asp:Button ID="btnLogin" runat="server" Text="Sign In" CssClass="btn btn-login" OnClick="btnLogin_Click" />
 
                     <div class="forgot-password">
-                        <a href="#"><i class="fas fa-key me-1"></i>Forgot your password?</a>
+                        <span class="text-muted"><i class="fas fa-key me-1"></i>Forgot your password? Contact your administrator.</span>
                     </div>
 
                     <div class="demo-creds">

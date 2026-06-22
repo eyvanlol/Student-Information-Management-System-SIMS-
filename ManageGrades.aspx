@@ -64,15 +64,11 @@
             </div>
             <nav class="mt-3">
                 <div class="nav-item"><a href="LecturerDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-                <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link active"><i class="fas fa-edit"></i><span>Grades & Assessments</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Student Progress</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>At-Risk Students</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-folder-open"></i><span>Course Materials</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a></div>
+                <div class="nav-item"><a href="LecturerProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
+                <div class="nav-item"><a href="LecturerCourses.aspx" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
+                <div class="nav-item"><a href="LecturerAttendance.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
+                <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link active"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
+                <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
             </nav>
         </div>
 
@@ -82,12 +78,11 @@
                 
                 <div class="topbar-actions">
                     <div class="notification-bell"><i class="fas fa-bell text-muted"></i><span class="badge">3</span></div>
-                    <div class="user-dropdown">
-                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#9b59b6,#8e44ad);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <span><asp:Label ID="lblTopUserName" runat="server" Text="Lecturer"></asp:Label></span>
-                        <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
+                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
                     </div>
                 </div>
             </div>

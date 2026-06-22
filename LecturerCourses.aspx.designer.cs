@@ -11,7 +11,7 @@ namespace StudentManagementSystem
 {
 
 
-    public partial class StudentAttendance
+    public partial class LecturerCourses
     {
 
         /// <summary>
@@ -51,30 +51,39 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.WebControls.Label lblTopUserName;
 
         /// <summary>
-        /// pnlWarning control.
+        /// txtSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlWarning;
+        protected global::System.Web.UI.WebControls.TextBox txtSearch;
 
         /// <summary>
-        /// litWarning control.
+        /// pnlCourseList control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litWarning;
+        protected global::System.Web.UI.WebControls.Panel pnlCourseList;
 
         /// <summary>
-        /// gvAttendance control.
+        /// rptCourses control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvAttendance;
+        protected global::System.Web.UI.WebControls.Repeater rptCourses;
+
+        /// <summary>
+        /// pnlEmptyCourses control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlEmptyCourses;
     }
 }

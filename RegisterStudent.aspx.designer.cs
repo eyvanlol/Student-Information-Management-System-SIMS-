@@ -7,26 +7,27 @@ namespace StudentManagementSystem
     public partial class RegisterStudent
     {
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
-        protected global::System.Web.UI.WebControls.Button btnClear;
-        protected global::System.Web.UI.WebControls.Button btnEnrol;
+        protected global::System.Web.UI.WebControls.Label lblUserName;
+        protected global::System.Web.UI.WebControls.Label lblTopUserName;
         protected global::System.Web.UI.WebControls.LinkButton btnLogout;
-        protected global::System.Web.UI.WebControls.CompareValidator cvPassword;
-        protected global::System.Web.UI.WebControls.DropDownList ddlProgramme;
+        protected global::System.Web.UI.WebControls.Panel pnlMsg;
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divMsg;
+        protected global::System.Web.UI.WebControls.Literal litMsg;
         protected global::System.Web.UI.WebControls.GridView gvStudents;
         protected global::System.Web.UI.WebControls.Label lblStudentCount;
-        protected global::System.Web.UI.WebControls.Label lblTopUserName;
-        protected global::System.Web.UI.WebControls.Label lblUserName;
-        protected global::System.Web.UI.WebControls.Literal litMsg;
-        protected global::System.Web.UI.WebControls.Panel pnlMsg;
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator revEmail;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvEmail;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvName;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPassword;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvProgramme;
-        protected global::System.Web.UI.WebControls.TextBox txtConfirmPassword;
-        protected global::System.Web.UI.WebControls.TextBox txtEmail;
         protected global::System.Web.UI.WebControls.TextBox txtName;
-        protected global::System.Web.UI.WebControls.TextBox txtPassword;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvName;
+        protected global::System.Web.UI.WebControls.TextBox txtIc;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvIc;
+        protected global::System.Web.UI.WebControls.TextBox txtPersonalEmail;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPersonalEmail;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revPersonalEmail;
+        protected global::System.Web.UI.WebControls.TextBox txtPhone;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPhone;
+        protected global::System.Web.UI.WebControls.DropDownList ddlProgramme;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvProgramme;
+        protected global::System.Web.UI.WebControls.DropDownList ddlIntake;
+        protected global::System.Web.UI.WebControls.Button btnRegister;
+        protected global::System.Web.UI.WebControls.Button btnClear;
     }
 }

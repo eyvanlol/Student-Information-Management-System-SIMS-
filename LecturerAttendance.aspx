@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LecturerAttendance.aspx.cs" Inherits="StudentManagementSystem.LecturerAttendance" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LecturerAttendance.aspx.cs" Inherits="StudentManagementSystem.LecturerAttendance" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,14 +15,15 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header .logo { width: 70px; height: 70px; background: linear-gradient(135deg, #9b59b6, #8e44ad); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
         .nav-item { padding: 0; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 14px 25px; display: flex; align-items: center;
             text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--secondary); }
+        .nav-link:hover, .nav-link.active { background: rgba(155, 89, 182, 0.15); color: white; border-left-color: #9b59b6; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
         .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -68,24 +69,19 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div style="width:70px;height:70px;background:linear-gradient(135deg,#9b59b6,#8e44ad);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;">
-                <i class="fas fa-chalkboard-teacher"></i>
-            </div>
+            <div class="logo"><i class="fas fa-chalkboard-teacher"></i></div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Lecturer"></asp:Label></h4>
-            <small>Lecturer</small>
+            <small>Senior Lecturer</small>
         </div>
 
         <nav class="mt-3">
-            <div class="nav-item"><a href="LecturerDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
-            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
-            <div class="nav-item"><a href="LecturerAttendance.aspx" class="nav-link active"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-            <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link"><i class="fas fa-edit"></i><span>Grades &amp; Assessments</span></a></div>
-            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Student Progress</span></a></div>
-            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-folder-open"></i><span>Course Materials</span></a></div>
-            <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a></div>
-        </nav>
+                <div class="nav-item"><a href="LecturerDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="LecturerProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
+                <div class="nav-item"><a href="LecturerCourses.aspx" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
+                <div class="nav-item"><a href="LecturerAttendance.aspx" class="nav-link active"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
+                <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
+                <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
+            </nav>
 
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -104,12 +100,12 @@
                     <i class="fas fa-bell text-muted"></i>
                 </div>
 
-                <div class="user-dropdown">
-                    <div style="width:35px;height:35px;background:linear-gradient(135deg,#9b59b6,#8e44ad);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                        <i class="fas fa-chalkboard-teacher"></i>
+                <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
                     </div>
-                    <span><asp:Label ID="lblTopUserName" runat="server" Text="Lecturer"></asp:Label></span>
-                </div>
             </div>
         </div>
 

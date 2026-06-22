@@ -127,39 +127,16 @@
             </div>
 
             <nav class="mt-3">
-                <div class="nav-item">
-                    <a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="RegisterLecturer.aspx" class="nav-link active"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Enrol Student</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-users"></i><span>Students</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
-                </div>
+                <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
+                <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
+                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link active"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
+                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
+                <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
+                <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
+                <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
+                <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
+                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
 
             <div class="sidebar-footer">
@@ -179,12 +156,11 @@
                         <i class="fas fa-bell text-muted"></i>
                         <span class="badge">3</span>
                     </div>
-                    <div class="user-dropdown">
+                    <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                            <i class="fas fa-user-shield"></i>
+                            <i class="fas fa-user"></i>
                         </div>
-                        <span><asp:Label ID="lblTopUserName" runat="server" Text="Head of Programme"></asp:Label></span>
-                        <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
+                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
                     </div>
                 </div>
             </div>
@@ -288,12 +264,31 @@
                                             ErrorMessage="Password is required." />
                                     </div>
 
-                                    <div class="mb-4">
+                                    <div class="mb-3">
                                         <label class="form-label">Confirm Password <span class="req">*</span></label>
                                         <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Re-enter password" />
                                         <asp:CompareValidator ID="cvPassword" runat="server" ControlToValidate="txtConfirmPassword"
                                             ControlToCompare="txtPassword" ValidationGroup="lect" CssClass="text-danger small" Display="Dynamic"
                                             ErrorMessage="Passwords do not match." />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Lecturer Title <span class="req">*</span></label>
+                                        <asp:TextBox ID="txtTitle" runat="server" CssClass="form-control" placeholder="e.g. Senior Lecturer of IT" />
+                                        <asp:RequiredFieldValidator ID="rfvTitle" runat="server" ControlToValidate="txtTitle"
+                                            ValidationGroup="lect" CssClass="text-danger small" Display="Dynamic"
+                                            ErrorMessage="Lecturer title is required." />
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label">Department</label>
+                                        <asp:DropDownList ID="ddlDepartment" runat="server" CssClass="form-select">
+                                            <asp:ListItem Text="-- Select Department --" Value="" />
+                                            <asp:ListItem Text="School of Computing" Value="School of Computing" />
+                                            <asp:ListItem Text="School of Business" Value="School of Business" />
+                                            <asp:ListItem Text="School of Engineering" Value="School of Engineering" />
+                                            <asp:ListItem Text="School of Design" Value="School of Design" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="d-grid gap-2">

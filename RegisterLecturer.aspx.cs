@@ -51,8 +51,10 @@ namespace StudentManagementSystem
             string name = txtName.Text.Trim();
             string email = txtEmail.Text.Trim().ToLower();
             string password = Login.HashPassword(txtPassword.Text);
+            string title = txtTitle.Text.Trim();
+            string department = ddlDepartment.SelectedValue;
 
-            string sql = "INSERT INTO LECTURER (name, email, password) VALUES (@name, @email, @password)";
+            string sql = "INSERT INTO LECTURER (name, email, password, lecturerTitle, department) VALUES (@name, @email, @password, @title, @dept)";
 
             try
             {
@@ -62,6 +64,8 @@ namespace StudentManagementSystem
                     cmd.Parameters.AddWithValue("@name", name);
                     cmd.Parameters.AddWithValue("@email", email);
                     cmd.Parameters.AddWithValue("@password", password);
+                    cmd.Parameters.AddWithValue("@title", title);
+                    cmd.Parameters.AddWithValue("@dept", string.IsNullOrEmpty(department) ? (object)DBNull.Value : department);
                     conn.Open();
                     cmd.ExecuteNonQuery();
                 }
@@ -125,6 +129,8 @@ namespace StudentManagementSystem
             txtEmail.Text = "";
             txtPassword.Text = "";
             txtConfirmPassword.Text = "";
+            txtTitle.Text = "";
+            ddlDepartment.SelectedIndex = 0;
         }
 
         protected void btnLogout_Click(object sender, EventArgs e)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -103,11 +103,32 @@ namespace StudentManagementSystem
                 return;
             }
 
-            int courseID = Convert.ToInt32(ddlCourse.SelectedValue);
+            // DUPLICATE CHECK: Prevent re-recording attendance for same course/date/session
             int lecturerID = Convert.ToInt32(Session["UserID"]);
+            int courseID = Convert.ToInt32(ddlCourse.SelectedValue);
             DateTime attendanceDate = Convert.ToDateTime(txtDate.Text);
             string sessionType = ddlSessionType.SelectedValue;
 
+            string dupSql = @"
+                SELECT COUNT(*) FROM ATTENDANCE
+                WHERE lecturerID = @lecturerID
+                AND courseID = @courseID
+                AND attendanceDate = @attendanceDate
+                AND sessionType = @sessionType";
+
+            object dupResult = DbHelper.ExecuteScalar(dupSql,
+                new SqlParameter("@lecturerID", lecturerID),
+                new SqlParameter("@courseID", courseID),
+                new SqlParameter("@attendanceDate", attendanceDate),
+                new SqlParameter("@sessionType", sessionType));
+
+            if (Convert.ToInt32(dupResult) > 0)
+            {
+                ShowMessage("Attendance has already been recorded for this course, date, and session type.", false);
+                return;
+            }
+
+            // END DUPLICATE CHECK
             using (SqlConnection con = new SqlConnection(cs))
             {
                 con.Open();

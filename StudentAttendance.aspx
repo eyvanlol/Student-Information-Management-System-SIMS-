@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentAttendance.aspx.cs" Inherits="StudentManagementSystem.StudentAttendance" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentAttendance.aspx.cs" Inherits="StudentManagementSystem.StudentAttendance" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -277,71 +277,13 @@
         </div>
 
         <nav class="mt-3">
-
-            <div class="nav-item">
-                <a href="StudentDashboard.aspx" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-user-circle"></i>
-                    <span>My Profile</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-book"></i>
-                    <span>My Courses</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Course Registration</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="StudentAttendance.aspx" class="nav-link active">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Attendance</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="StudentResult.aspx" class="nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Academic Results</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="StudentTranscript.aspx" class="nav-link">
-                    <i class="fas fa-history"></i>
-                    <span>Academic History</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                </a>
-            </div>
-
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
-
-        </nav>
+                <div class="nav-item"><a href="StudentDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="StudentEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
+                <div class="nav-item"><a href="StudentAttendance.aspx" class="nav-link active"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></div>
+                <div class="nav-item"><a href="StudentResult.aspx" class="nav-link"><i class="fas fa-chart-line"></i><span>Results</span></a></div>
+                <div class="nav-item"><a href="StudentTranscript.aspx" class="nav-link"><i class="fas fa-file-alt"></i><span>Transcript</span></a></div>
+                <div class="nav-item"><a href="StudentNotifications.aspx" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
+            </nav>
 
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout"
@@ -372,18 +314,12 @@
                     <span class="badge">4</span>
                 </div>
 
-                <div class="user-dropdown">
-
-                    <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                        <i class="fas fa-user-graduate"></i>
+                <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
                     </div>
-
-                    <span>
-                        <asp:Label ID="lblTopUserName" runat="server"></asp:Label>
-                    </span>
-
-                    <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
-                </div>
 
             </div>
         </div>
