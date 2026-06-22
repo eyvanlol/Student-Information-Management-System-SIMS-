@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,39 +9,31 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
     <style>
-        :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #1abc9c; --accent: #e74c3c; --success: #27ae60; }
+        :root { --sidebar-width: 260px; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
+        /* ── SIDEBAR ── */
         .sidebar {
             width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            background: linear-gradient(180deg, #1a5fa8 0%, #2980b9 100%);
+            color: white; z-index: 1000; overflow-y: auto;
         }
-        .sidebar-header {
-            padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .sidebar-header .logo {
-            width: 70px; height: 70px; background: linear-gradient(135deg, #1abc9c, #16a085);
-            border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: white;
-        }
-        .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
-        .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.15); }
+        .sidebar-header h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-header small { color: rgba(255,255,255,0.65); font-size: 0.75rem; }
         .nav-item { padding: 0; }
         .nav-link {
-            color: rgba(255,255,255,0.8); padding: 14px 25px; display: flex; align-items: center;
-            text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent;
+            color: rgba(255,255,255,0.8); padding: 13px 25px; display: flex; align-items: center;
+            text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; font-size: 0.9rem;
         }
         .nav-link:hover, .nav-link.active {
-            background: rgba(26, 188, 156, 0.15); color: white; border-left-color: #1abc9c;
+            background: rgba(255,255,255,0.15); color: white; border-left-color: #fff;
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.15); }
 
+        /* ── MAIN ── */
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar {
             background: white; padding: 15px 30px; display: flex; justify-content: space-between;
@@ -51,8 +43,7 @@
         .topbar-actions { display: flex; align-items: center; gap: 15px; }
         .notification-bell {
             position: relative; width: 40px; height: 40px; border-radius: 50%;
-            background: #f8f9fa; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s;
+            background: #f8f9fa; display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
         .notification-bell:hover { background: #e9ecef; }
         .notification-bell .badge {
@@ -60,364 +51,271 @@
             font-size: 0.65rem; padding: 3px 6px; border-radius: 10px;
         }
         .user-dropdown {
-            display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 15px;
-            border-radius: 10px; transition: all 0.3s;
+            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            padding: 8px 15px; border-radius: 10px; transition: all 0.3s;
         }
         .user-dropdown:hover { background: #f8f9fa; }
         .user-dropdown span { font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
 
-        .dashboard-content { padding: 30px; }
-        .stats-row { margin-bottom: 30px; }
+        /* ── CONTENT ── */
+        .page-content { padding: 30px; }
+
+        /* ── STAT CARDS ── */
         .stat-card {
-            background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 20px; transition: transform 0.3s;
+            background: white; border-radius: 15px; padding: 22px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 18px; transition: transform 0.3s;
         }
-        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card:hover { transform: translateY(-4px); }
         .stat-icon {
-            width: 60px; height: 60px; border-radius: 15px; display: flex;
-            align-items: center; justify-content: center; font-size: 1.5rem; color: white;
+            width: 56px; height: 56px; border-radius: 14px; display: flex;
+            align-items: center; justify-content: center; font-size: 1.4rem; color: white; flex-shrink: 0;
         }
-        .stat-icon.teal { background: linear-gradient(135deg, #1abc9c, #16a085); }
-        .stat-icon.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .stat-icon.orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
-        .stat-icon.purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-        .stat-info h3 { font-size: 1.8rem; font-weight: 700; margin: 0; color: #2c3e50; }
-        .stat-info p { color: #7f8c8d; margin: 0; font-size: 0.9rem; }
+        .icon-blue   { background: linear-gradient(135deg, #1a5fa8, #2980b9); }
+        .icon-green  { background: linear-gradient(135deg, #27ae60, #229954); }
+        .icon-orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .icon-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+        .icon-teal   { background: linear-gradient(135deg, #16a085, #1abc9c); }
+        .stat-info h3 { font-size: 1.6rem; font-weight: 700; margin: 0; color: #2c3e50; }
+        .stat-info p  { color: #7f8c8d; margin: 0; font-size: 0.85rem; }
 
-        .content-card {
-            background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-bottom: 25px; overflow: hidden;
-        }
-        .card-header {
-            padding: 20px 25px; border-bottom: 1px solid #f0f0f0;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .card-header h5 { margin: 0; font-weight: 700; color: #2c3e50; }
-        .card-header .btn-sm {
-            padding: 6px 15px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
-        }
-        .card-body { padding: 25px; }
+        /* ── CONTENT CARDS ── */
+        .content-card { background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 24px; overflow: hidden; }
+        .card-header-custom { padding: 18px 24px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .card-header-custom h5 { margin: 0; font-weight: 700; color: #2c3e50; font-size: 1rem; }
+        .card-body-custom { padding: 24px; }
 
+        /* ── TABLE ── */
         .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .table-custom th {
-            background: #f8f9fa; padding: 15px; font-size: 0.8rem; font-weight: 700;
-            color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; border: none;
-        }
-        .table-custom td {
-            padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; color: #2c3e50;
-        }
+        .table-custom th { background: #f8f9fa; padding: 12px 15px; font-size: 0.78rem; font-weight: 700; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; }
+        .table-custom td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 0.88rem; color: #2c3e50; vertical-align: middle; }
+        .table-custom tr:last-child td { border-bottom: none; }
         .table-custom tr:hover td { background: #f8f9fa; }
 
-        .badge-custom {
-            padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-        }
-        .badge-success { background: #d4edda; color: #155724; }
-        .badge-warning { background: #fff3cd; color: #856404; }
-        .badge-danger { background: #f8d7da; color: #721c24; }
-        .badge-info { background: #d1ecf1; color: #0c5460; }
+        /* ── BADGES ── */
+        .badge-good    { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-warn    { background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-danger  { background: #f8d7da; color: #721c24; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-info    { background: #d1ecf1; color: #0c5460; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
 
-        .grade-a { background: #d4edda; color: #155724; padding: 5px 15px; border-radius: 8px; font-weight: 700; }
-        .grade-b { background: #d1ecf1; color: #0c5460; padding: 5px 15px; border-radius: 8px; font-weight: 700; }
-        .grade-c { background: #fff3cd; color: #856404; padding: 5px 15px; border-radius: 8px; font-weight: 700; }
-        .grade-d { background: #f8d7da; color: #721c24; padding: 5px 15px; border-radius: 8px; font-weight: 700; }
+        /* ── NOTIFICATION ITEMS ── */
+        .notif-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+        .dot-blue   { background: #3498db; }
+        .dot-green  { background: #27ae60; }
+        .dot-amber  { background: #f39c12; }
+        .dot-red    { background: #e74c3c; }
+        .dot-gray   { background: #95a5a6; }
+        .notif-title { font-size: 0.88rem; font-weight: 600; color: #2c3e50; margin-bottom: 2px; }
+        .notif-msg   { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 3px; }
+        .notif-time  { font-size: 0.75rem; color: #bdc3c7; }
 
-        .course-card {
-            background: white; border-radius: 12px; padding: 20px; border: 2px solid #f0f0f0;
-            transition: all 0.3s; cursor: pointer; margin-bottom: 15px;
+        /* ── WELCOME BANNER ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, #1a5fa8, #2980b9);
+            border-radius: 15px; padding: 24px 28px; color: white;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 24px;
         }
-        .course-card:hover { border-color: #1abc9c; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .course-card .course-code { font-size: 0.75rem; color: #1abc9c; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .course-card .course-title { font-weight: 700; color: #2c3e50; margin-bottom: 8px; font-size: 1rem; }
-        .course-card .course-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: #7f8c8d; }
-        .course-card .course-grade { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+        .welcome-banner h3 { font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+        .welcome-banner p  { font-size: 0.88rem; opacity: 0.85; margin: 0; }
+        .welcome-icon { font-size: 3rem; opacity: 0.3; }
 
-        .notification-item {
-            padding: 15px; border-radius: 10px; margin-bottom: 10px; transition: all 0.3s;
+        /* ── ALERT ── */
+        .alert-attendance {
+            background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px;
+            padding: 12px 18px; font-size: 0.88rem; color: #856404;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
         }
-        .notification-item:hover { background: #f8f9fa; }
-        .notification-item .notif-icon {
-            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;
-        }
-        .notification-item .notif-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; }
-        .notification-item .notif-text { font-size: 0.8rem; color: #6c757d; }
-        .notification-item .notif-time { font-size: 0.75rem; color: #adb5bd; }
 
-        .gpa-circle {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: conic-gradient(#1abc9c 0% 85%, #e9ecef 85% 100%);
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;
-        }
-        .gpa-circle-inner {
-            width: 100px; height: 100px; border-radius: 50%; background: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .gpa-circle-inner h3 { margin: 0; font-size: 1.8rem; font-weight: 700; color: #1abc9c; }
-        .gpa-circle-inner small { font-size: 0.7rem; color: #6c757d; }
-
-        .progress { height: 8px; border-radius: 10px; background: #e9ecef; }
-        .progress-bar { border-radius: 10px; }
-
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; }
-        }
+        /* ── VIEW ALL LINK ── */
+        .view-all { font-size: 0.82rem; color: #3498db; text-decoration: none; font-weight: 600; }
+        .view-all:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <form id="form1" runat="server">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-user-graduate"></i></div>
-                <h4><asp:Label ID="lblUserName" runat="server" Text="John Smith"></asp:Label></h4>
-                <small>Student ID: STU2024001</small>
+<form id="form1" runat="server">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div style="width:50px;height:50px;background:rgba(255,255,255,0.2);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;">
+                <i class="fas fa-user-graduate"></i>
             </div>
+            <h4><asp:Label ID="lblUserName" runat="server" Text="Student"></asp:Label></h4>
+            <small><asp:Label ID="lblProgramme" runat="server" Text=""></asp:Label></small>
+        </div>
+        <nav class="mt-3">
+            <div class="nav-item"><a href="StudentDashboard.aspx"  class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+            <div class="nav-item"><a href="StudentEnrolment.aspx"  class="nav-link"><i class="fas fa-clipboard-list"></i><span>My Enrolment</span></a></div>
+            <div class="nav-item"><a href="#"                      class="nav-link"><i class="fas fa-chart-bar"></i><span>My Results</span></a></div>
+            <div class="nav-item"><a href="#"                      class="nav-link"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></div>
+            <div class="nav-item"><a href="#"                      class="nav-link"><i class="fas fa-history"></i><span>Academic History</span></a></div>
+            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
+            <div class="nav-item"><a href="#"                      class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a></div>
 
-            <nav class="mt-3">
-                <div class="nav-item"><a href="StudentDashboard.aspx" class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-plus-circle"></i><span>Course Registration</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Academic Results</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-history"></i><span>Academic History</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
-                <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a></div>
-            </nav>
+        </nav>
+        <div class="sidebar-footer">
+            <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </asp:LinkButton>
+        </div>
+    </div>
 
-            <div class="sidebar-footer">
-                <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
-                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-                </asp:LinkButton>
+    <!-- ── MAIN CONTENT ── -->
+    <div class="main-content">
+        <div class="topbar">
+            <h2><i class="fas fa-home me-2 text-primary"></i>Student Dashboard</h2>
+            <div class="topbar-actions">
+                <div class="notification-bell">
+                    <i class="fas fa-bell text-muted"></i>
+                    <span class="badge"><asp:Label ID="lblBellCount" runat="server" Text="0"></asp:Label></span>
+                </div>
+                <div class="user-dropdown">
+                    <div style="width:35px;height:35px;background:linear-gradient(135deg,#1a5fa8,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <span><asp:Label ID="lblTopUserName" runat="server" Text="Student"></asp:Label></span>
+                    <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
+                </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="topbar">
-                <h2><i class="fas fa-home me-2" style="color:#1abc9c;"></i>Student Dashboard</h2>
-                <div class="topbar-actions">
-                    <div class="notification-bell"><i class="fas fa-bell text-muted"></i><span class="badge">4</span></div>
-                    <div class="user-dropdown">
-                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
-                            <i class="fas fa-user-graduate"></i>
+        <div class="page-content">
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div>
+                    <h3>Welcome back, <asp:Label ID="lblWelcomeName" runat="server" Text="Student"></asp:Label>!</h3>
+                    <p><asp:Label ID="lblWelcomeSemester" runat="server" Text="Current semester loading..."></asp:Label></p>
+                </div>
+                <i class="fas fa-graduation-cap welcome-icon"></i>
+            </div>
+
+            <!-- Low attendance warning — shown only if any course below 80% -->
+            <asp:Panel ID="pnlAttendanceWarning" runat="server" Visible="false">
+                <div class="alert-attendance">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><asp:Label ID="lblAttendanceWarning" runat="server"></asp:Label></span>
+                </div>
+            </asp:Panel>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-blue"><i class="fas fa-book"></i></div>
+                        <div class="stat-info">
+                            <h3><asp:Label ID="lblEnrolledCount" runat="server" Text="0"></asp:Label></h3>
+                            <p>Courses enrolled</p>
                         </div>
-                        <span><asp:Label ID="lblTopUserName" runat="server" Text="Eyvan"></asp:Label></span>
-                        <i class="fas fa-chevron-down text-muted" style="font-size:0.7rem;"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-green"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3><asp:Label ID="lblAttendancePct" runat="server" Text="—"></asp:Label></h3>
+                            <p>Overall attendance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-purple"><i class="fas fa-star"></i></div>
+                        <div class="stat-info">
+                            <h3><asp:Label ID="lblGPA" runat="server" Text="—"></asp:Label></h3>
+                            <p>Current GPA</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-orange"><i class="fas fa-bell"></i></div>
+                        <div class="stat-info">
+                            <h3><asp:Label ID="lblUnreadNotif" runat="server" Text="0"></asp:Label></h3>
+                            <p>Unread notifications</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="dashboard-content">
-                
-                <div class="row stats-row">
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon teal"><i class="fas fa-book"></i></div>
-                            <div class="stat-info">
-                                <h3>5</h3>
-                                <p>Enrolled Courses</p>
-                            </div>
+            <!-- Current Courses + Notifications -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="content-card">
+                        <div class="card-header-custom">
+                            <h5><i class="fas fa-book-open me-2 text-primary"></i>Current semester courses</h5>
+                            <a href="StudentEnrolment.aspx" class="view-all">View enrolment →</a>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon blue"><i class="fas fa-award"></i></div>
-                            <div class="stat-info">
-                                <h3>3.85</h3>
-                                <p>Current GPA</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon orange"><i class="fas fa-clipboard-check"></i></div>
-                            <div class="stat-info">
-                                <h3>94%</h3>
-                                <p>Attendance Rate</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon purple"><i class="fas fa-coins"></i></div>
-                            <div class="stat-info">
-                                <h3>18</h3>
-                                <p>Credits Earned</p>
-                            </div>
+                        <div class="card-body-custom p-0">
+                            <asp:GridView
+                                ID="gvCourses"
+                                runat="server"
+                                AutoGenerateColumns="false"
+                                CssClass="table-custom"
+                                EmptyDataText="No courses enrolled for current semester."
+                                EmptyDataRowStyle-CssClass="text-center p-4 text-muted">
+                                <Columns>
+                                    <asp:BoundField DataField="courseCode" HeaderText="Code" ItemStyle-CssClass="font-monospace" />
+                                    <asp:BoundField DataField="courseName" HeaderText="Course name" />
+                                    <asp:BoundField DataField="creditHour" HeaderText="Credit hrs" ItemStyle-HorizontalAlign="Center" />
+                                    <asp:TemplateField HeaderText="Attendance">
+                                        <ItemTemplate>
+                                            <span class='<%# GetAttendanceBadge(Eval("attendancePct")) %>'>
+                                                <%# Eval("attendancePct") != DBNull.Value ? Eval("attendancePct").ToString() + "%" : "—" %>
+                                            </span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Status">
+                                        <ItemTemplate>
+                                            <span class='<%# GetEnrolmentBadge(Eval("status").ToString()) %>'>
+                                                <%# Eval("status") %>
+                                            </span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-8">
-                        
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-book me-2" style="color:#1abc9c;"></i>My Courses</h5>
-                                <asp:Button ID="btnRegisterCourse" runat="server" Text="Register/Drop" CssClass="btn btn-outline-primary btn-sm" />
-                            </div>
-                            <div class="card-body">
-                                <div class="course-card">
-                                    <div class="course-code">CS101 - Introduction to AI</div>
-                                    <div class="course-title">Introduction to AI</div>
-                                    <div class="course-meta">
-                                        <span><i class="fas fa-chalkboard-teacher me-1"></i>Ms. Vasuky</span>
-                                        <span><i class="fas fa-clock me-1"></i>Mon & Wed, 9:00 AM</span>
-                                    </div>
-                                    <div class="course-grade">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span style="font-size:0.85rem;color:#6c757d;">Current Grade</span>
-                                            <span class="grade-a">A</span>
+                <!-- Recent Notifications -->
+                <div class="col-md-4">
+                    <div class="content-card">
+                        <div class="card-header-custom">
+                            <h5><i class="fas fa-bell me-2 text-warning"></i>Recent notifications</h5>
+                            <a href="#" class="view-all">View all →</a>
+                        </div>
+                        <div class="card-body-custom">
+                            <asp:Repeater ID="rptNotifications" runat="server">
+                                <ItemTemplate>
+                                    <div class="notif-item">
+                                        <div class='notif-dot <%# GetNotifDot(Eval("notifType").ToString()) %>'></div>
+                                        <div>
+                                            <div class="notif-title"><%# Eval("title") %></div>
+                                            <div class="notif-msg"><%# TruncateMsg(Eval("message").ToString()) %></div>
+                                            <div class="notif-time"><%# TimeAgo(Eval("createdAt")) %></div>
                                         </div>
                                     </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                            <asp:Panel ID="pnlNoNotif" runat="server" Visible="false">
+                                <div style="text-align:center;padding:20px;color:#bdc3c7;font-size:0.88rem;">
+                                    <i class="fas fa-bell-slash" style="font-size:1.5rem;display:block;margin-bottom:8px;"></i>
+                                    No new notifications
                                 </div>
-                                <div class="course-card">
-                                    <div class="course-code">MAT201 - Calculus II</div>
-                                    <div class="course-title">Calculus II</div>
-                                    <div class="course-meta">
-                                        <span><i class="fas fa-chalkboard-teacher me-1"></i>Dr. Ace</span>
-                                        <span><i class="fas fa-clock me-1"></i>Tue & Thu, 10:00 AM</span>
-                                    </div>
-                                    <div class="course-grade">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span style="font-size:0.85rem;color:#6c757d;">Current Grade</span>
-                                            <span class="grade-b">B+</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-chart-line me-2" style="color:#1abc9c;"></i>Recent Results</h5>
-                                <asp:Button ID="btnViewAllResults" runat="server" Text="View All" CssClass="btn btn-outline-primary btn-sm" />
-                            </div>
-                            <div class="card-body p-0">
-                                <table class="table-custom">
-                                    <thead>
-                                        <tr><th>Course</th><th>Assessment</th><th>Score</th><th>Grade</th><th>Date</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>DCS101</strong></td>
-                                            <td>Mid-Term Exam</td>
-                                            <td>88/100</td>
-                                            <td><span class="grade-a">A</span></td>
-                                            <td>June 15, 2024</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>MAT201</strong></td>
-                                            <td>Quiz 3</td>
-                                            <td>75/100</td>
-                                            <td><span class="grade-b">B</span></td>
-                                            <td>June 14, 2024</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>DCS101</strong></td>
-                                            <td>Assignment 2</td>
-                                            <td>95/100</td>
-                                            <td><span class="grade-a">A+</span></td>
-                                            <td>June 08, 2026</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-award me-2" style="color:#1abc9c;"></i>GPA Overview</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="gpa-circle">
-                                    <div class="gpa-circle-inner">
-                                        <h3>3.85</h3>
-                                        <small>CUMULATIVE GPA</small>
-                                    </div>
-                                </div>
-                                <div class="row text-center mt-3">
-                                    <div class="col-4">
-                                        <h5 style="color:#1abc9c;font-weight:700;">18</h5>
-                                        <small style="color:#6c757d;">Credits</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <h5 style="color:#3498db;font-weight:700;">5</h5>
-                                        <small style="color:#6c757d;">Courses</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <h5 style="color:#f39c12;font-weight:700;">2nd</h5>
-                                        <small style="color:#6c757d;">Year</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-clipboard-check me-2" style="color:#1abc9c;"></i>Attendance Summary</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">DCS101</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">96%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-success" style="width:96%"></div></div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">MAT201</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">88%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-info" style="width:88%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">DCS205</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">94%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-success" style="width:94%"></div></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-bell me-2 text-danger"></i>Notifications</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="notification-item">
-                                    <div class="d-flex">
-                                        <div class="notif-icon" style="background:#d4edda;color:#155724;"><i class="fas fa-graduation-cap"></i></div>
-                                        <div style="flex:1;">
-                                            <div class="notif-title">Grade Published</div>
-                                            <div class="notif-text">DCS101 Mid-Term results are now available.</div>
-                                            <div class="notif-time"><i class="far fa-clock me-1"></i>2 hours ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="notification-item">
-                                    <div class="d-flex">
-                                        <div class="notif-icon" style="background:#fff3cd;color:#856404;"><i class="fas fa-calendar"></i></div>
-                                        <div style="flex:1;">
-                                            <div class="notif-title">Exam Schedule Updated</div>
-                                            <div class="notif-text">Final exam dates have been announced.</div>
-                                            <div class="notif-time"><i class="far fa-clock me-1"></i>5 hours ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </asp:Panel>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
-    </form>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+
+</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
