@@ -1,0 +1,414 @@
+
+-- =====================================================================
+-- PATCH 1: STUDENT — add missing columns
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'personalEmail')
+    ALTER TABLE STUDENT ADD personalEmail VARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'emergencyContactName')
+    ALTER TABLE STUDENT ADD emergencyContactName VARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'emergencyContactPhone')
+    ALTER TABLE STUDENT ADD emergencyContactPhone VARCHAR(20) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'emergencyContactRel')
+    ALTER TABLE STUDENT ADD emergencyContactRel VARCHAR(50) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'studentCode')
+    ALTER TABLE STUDENT ADD studentCode VARCHAR(20) NULL;
+GO
+
+-- Add unique constraint on studentCode if not exists
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'STUDENT' AND CONSTRAINT_NAME = 'uq_student_code')
+    ALTER TABLE STUDENT ADD CONSTRAINT uq_student_code UNIQUE (studentCode);
+GO
+
+-- Update existing seed students
+UPDATE STUDENT SET personalEmail = 'eyvan@gmail.com',      studentCode = 'STU2604001' WHERE studentID = 1 AND personalEmail IS NULL;
+UPDATE STUDENT SET personalEmail = 'john.smith@gmail.com', studentCode = 'STU2604002' WHERE studentID = 2 AND personalEmail IS NULL;
+UPDATE STUDENT SET personalEmail = 'alice.wong@gmail.com', studentCode = 'STU2604003' WHERE studentID = 3 AND personalEmail IS NULL;
+UPDATE STUDENT SET personalEmail = 'bob.lee@gmail.com',    studentCode = 'STU2604004' WHERE studentID = 4 AND personalEmail IS NULL;
+GO
+
+
+-- =====================================================================
+-- PATCH 2: LECTURER — add missing columns
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'personalEmail')
+    ALTER TABLE LECTURER ADD personalEmail VARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'lecturerCode')
+    ALTER TABLE LECTURER ADD lecturerCode VARCHAR(20) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'department')
+    ALTER TABLE LECTURER ADD department VARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'staffType')
+    ALTER TABLE LECTURER ADD staffType VARCHAR(20) NULL;
+GO
+
+-- Add unique constraint on lecturerCode if not exists
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'LECTURER' AND CONSTRAINT_NAME = 'uq_lecturer_code')
+    ALTER TABLE LECTURER ADD CONSTRAINT uq_lecturer_code UNIQUE (lecturerCode);
+GO
+
+-- Add check constraint on staffType if not exists
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'LECTURER' AND CONSTRAINT_NAME = 'chk_staff_type')
+    ALTER TABLE LECTURER ADD CONSTRAINT chk_staff_type CHECK (staffType IN ('Full-time','Part-time'));
+GO
+
+-- Update existing seed lecturers
+UPDATE LECTURER SET personalEmail = 'sarah.chen@gmail.com',   lecturerCode = 'LEC2604001', department = 'School of Computing', staffType = 'Full-time' WHERE lecturerID = 1 AND personalEmail IS NULL;
+UPDATE LECTURER SET personalEmail = 'michael.tan@gmail.com',  lecturerCode = 'LEC2604002', department = 'School of Computing', staffType = 'Full-time' WHERE lecturerID = 2 AND personalEmail IS NULL;
+UPDATE LECTURER SET personalEmail = 'vasuky@gmail.com',       lecturerCode = 'LEC2604003', department = 'School of Computing', staffType = 'Full-time' WHERE lecturerID = 3 AND personalEmail IS NULL;
+UPDATE LECTURER SET personalEmail = 'james.wilson@gmail.com', lecturerCode = 'LEC2604004', department = 'School of Business',  staffType = 'Part-time' WHERE lecturerID = 4 AND personalEmail IS NULL;
+GO
+
+
+-- =====================================================================
+-- PATCH 3: HOP_ADMIN — add adminCode column
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'HOP_ADMIN' AND COLUMN_NAME = 'adminCode')
+    ALTER TABLE HOP_ADMIN ADD adminCode VARCHAR(20) NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'HOP_ADMIN' AND CONSTRAINT_NAME = 'uq_admin_code')
+    ALTER TABLE HOP_ADMIN ADD CONSTRAINT uq_admin_code UNIQUE (adminCode);
+GO
+
+UPDATE HOP_ADMIN SET adminCode = 'ADM2604001' WHERE adminID = 1 AND adminCode IS NULL;
+GO
+
+
+-- =====================================================================
+-- PATCH 4: ENROLMENT — fix status values and constraints
+-- =====================================================================
+
+-- Step 1: Update any 'Active' records to 'enrolled'
+UPDATE ENROLMENT SET status = 'enrolled' WHERE status = 'Active';
+GO
+
+-- Step 2: Drop old default constraint on status dynamically
+DECLARE @constraintName NVARCHAR(200);
+SELECT @constraintName = dc.name
+FROM sys.default_constraints dc
+JOIN sys.columns c ON dc.parent_object_id = c.object_id
+    AND dc.parent_column_id = c.column_id
+JOIN sys.tables t ON c.object_id = t.object_id
+WHERE t.name = 'ENROLMENT' AND c.name = 'status';
+
+IF @constraintName IS NOT NULL
+    EXEC('ALTER TABLE ENROLMENT DROP CONSTRAINT ' + @constraintName);
+GO
+
+-- Step 3: Add new default constraint
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'ENROLMENT' AND CONSTRAINT_NAME = 'df_enrolment_status')
+    ALTER TABLE ENROLMENT ADD CONSTRAINT df_enrolment_status DEFAULT 'pending' FOR status;
+GO
+
+-- Step 4: Add CHECK constraint for allowed status values
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'ENROLMENT' AND CONSTRAINT_NAME = 'chk_enrolment_status')
+    ALTER TABLE ENROLMENT ADD CONSTRAINT chk_enrolment_status CHECK (status IN (
+        'pending',
+        'enrolled',
+        'drop_requested',
+        'dropped',
+        'rejected',
+        'confirmed'
+    ));
+GO
+
+
+-- =====================================================================
+-- PATCH 5: SEMESTER_SESSION — create if not exists
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SEMESTER_SESSION')
+BEGIN
+    CREATE TABLE SEMESTER_SESSION (
+        sessionID       INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        semesterName    VARCHAR(30)  NOT NULL,
+        academicYear    VARCHAR(10)  NOT NULL,
+        semesterType    VARCHAR(10)  NOT NULL DEFAULT 'Long',
+        enrolStartDate  DATE         NOT NULL,
+        enrolEndDate    DATE         NOT NULL,
+        classStartDate  DATE         NULL,
+        status          VARCHAR(10)  NOT NULL DEFAULT 'Closed',
+        createdBy       INT          NULL,
+
+        CONSTRAINT chk_session_status CHECK (status IN ('Open','Closed')),
+        CONSTRAINT chk_semester_type  CHECK (semesterType IN ('Long','Short')),
+        CONSTRAINT chk_enrol_dates    CHECK (enrolEndDate >= enrolStartDate),
+        CONSTRAINT fk_session_admin   FOREIGN KEY (createdBy) REFERENCES HOP_ADMIN(adminID)
+    );
+
+    INSERT INTO SEMESTER_SESSION (semesterName, academicYear, semesterType, enrolStartDate, enrolEndDate, classStartDate, status, createdBy) VALUES
+    ('JANUARY 2026', '2025/2026', 'Short', '2025-12-01', '2025-12-20', '2026-01-05', 'Closed', 1),
+    ('APRIL 2026',   '2025/2026', 'Long',  '2026-03-01', '2026-03-31', '2026-04-07', 'Closed', 1),
+    ('AUGUST 2026',  '2026/2027', 'Long',  '2026-06-01', '2026-06-30', '2026-08-03', 'Open',   1);
+
+    PRINT 'SEMESTER_SESSION created and seeded.';
+END
+ELSE
+    PRINT 'SEMESTER_SESSION already exists — skipped.';
+GO
+
+
+-- =====================================================================
+-- PATCH 6: NOTIFICATION — create if not exists
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'NOTIFICATION')
+BEGIN
+    CREATE TABLE NOTIFICATION (
+        notificationID  INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        recipientID     INT           NOT NULL,
+        recipientRole   VARCHAR(10)   NOT NULL,
+        title           VARCHAR(200)  NOT NULL,
+        message         NVARCHAR(MAX) NOT NULL,
+        isRead          BIT           NOT NULL DEFAULT 0,
+        createdAt       DATETIME      NOT NULL DEFAULT GETDATE(),
+        notifType       VARCHAR(50)   NULL,
+
+        CONSTRAINT chk_notif_role CHECK (recipientRole IN ('student','lecturer','all'))
+    );
+
+    INSERT INTO NOTIFICATION (recipientID, recipientRole, title, message, isRead, notifType) VALUES
+    (1, 'student', 'Grades published — DCS101',    'Your Introduction to AI marks are now available. Grade: B+ (78.50)',                                  0, 'grade'),
+    (1, 'student', 'Attendance warning — DCS205',  'Your attendance for Software Engineering has dropped below 80%. Please attend all remaining classes.', 0, 'attendance'),
+    (1, 'student', 'Enrolment open — AUGUST 2026', 'HOP has opened enrolment for AUGUST 2026 semester. Deadline: 30 June 2026.',                          1, 'enrolment');
+
+    PRINT 'NOTIFICATION created and seeded.';
+END
+ELSE
+    PRINT 'NOTIFICATION already exists — skipped.';
+GO
+
+
+-- =====================================================================
+-- PATCH 7: RESULT — add publishedStatus column
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'RESULT' AND COLUMN_NAME = 'publishedStatus')
+BEGIN
+    ALTER TABLE RESULT
+    ADD publishedStatus VARCHAR(10) NOT NULL DEFAULT 'Draft'
+        CONSTRAINT chk_result_published CHECK (publishedStatus IN ('Draft','Published'));
+
+    -- Set existing results to Published since they already have publishedDate
+    UPDATE RESULT SET publishedStatus = 'Published' WHERE publishedDate IS NOT NULL;
+
+    PRINT 'publishedStatus added to RESULT.';
+END
+ELSE
+    PRINT 'publishedStatus already exists in RESULT — skipped.';
+GO
+
+
+-- =====================================================================
+-- PATCH 8: NOTIFICATION — columns for the announcement feature
+-- Needed by Lecturer Announcements (post + my past announcements) and
+-- the shared NotificationHelper.cs.
+--   groupKey : shared GUID across all rows from ONE announcement post
+--   senderID : who triggered it (lecturerID / adminID); NULL for system rows
+--   courseID : which course an announcement targeted; NULL = all-courses
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NOTIFICATION' AND COLUMN_NAME = 'groupKey')
+    ALTER TABLE NOTIFICATION ADD groupKey VARCHAR(50) NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NOTIFICATION' AND COLUMN_NAME = 'senderID')
+    ALTER TABLE NOTIFICATION ADD senderID INT NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NOTIFICATION' AND COLUMN_NAME = 'courseID')
+    ALTER TABLE NOTIFICATION ADD courseID INT NULL;
+GO
+
+-- Index for the lecturer "my past announcements" query
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_NOTIFICATION_sender')
+    CREATE INDEX IX_NOTIFICATION_sender ON NOTIFICATION (senderID, notifType);
+GO
+
+-- Index for the student panel (newest-first) + unread badge
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_NOTIFICATION_recipient')
+    CREATE INDEX IX_NOTIFICATION_recipient ON NOTIFICATION (recipientID, createdAt DESC);
+GO
+
+PRINT 'PATCH 8 applied: NOTIFICATION groupKey / senderID / courseID ready.';
+GO
+
+-- OPTIONAL — lock the notifType enum at DB level. Leave commented until the
+-- team agrees on these 7 values; all current data already conforms.
+-- IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'NOTIFICATION' AND CONSTRAINT_NAME = 'chk_notif_type')
+--     ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_type CHECK (notifType IN
+--         ('grade','attendance','enrolment','announcement','drop_approved','drop_rejected','welcome'));
+-- GO
+
+
+-- =====================================================================
+-- PATCH 9: STUDENT / LECTURER — columns for the Manage Users form
+-- (department + staffType for lecturer already added in PATCH 2)
+-- =====================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'icNumber')
+    ALTER TABLE STUDENT ADD icNumber VARCHAR(20) NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'phone')
+    ALTER TABLE STUDENT ADD phone VARCHAR(20) NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'intakeSemester')
+    ALTER TABLE STUDENT ADD intakeSemester VARCHAR(30) NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'icNumber')
+    ALTER TABLE LECTURER ADD icNumber VARCHAR(20) NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'phone')
+    ALTER TABLE LECTURER ADD phone VARCHAR(20) NULL;
+GO
+
+PRINT 'PATCH 9 applied: icNumber / phone / intakeSemester ready.';
+GO
+
+
+-- =====================================================================
+-- VERIFY — run after patching to confirm everything applied correctly
+-- Expected row counts:
+-- PROGRAMME: 5, HOP_ADMIN: 1, LECTURER: 4, STUDENT: 4
+-- COURSE: 5, ENROLMENT: 5, ATTENDANCE: 5, RESULT: 3
+-- REPORT: 0, SEMESTER_SESSION: 3, NOTIFICATION: 3
+-- =====================================================================
+SELECT 'PROGRAMME'        AS tbl, COUNT(*) AS rows FROM PROGRAMME;
+SELECT 'HOP_ADMIN'        AS tbl, COUNT(*) AS rows FROM HOP_ADMIN;
+SELECT 'LECTURER'         AS tbl, COUNT(*) AS rows FROM LECTURER;
+SELECT 'STUDENT'          AS tbl, COUNT(*) AS rows FROM STUDENT;
+SELECT 'COURSE'           AS tbl, COUNT(*) AS rows FROM COURSE;
+SELECT 'ENROLMENT'        AS tbl, COUNT(*) AS rows FROM ENROLMENT;
+SELECT 'ATTENDANCE'       AS tbl, COUNT(*) AS rows FROM ATTENDANCE;
+SELECT 'RESULT'           AS tbl, COUNT(*) AS rows FROM RESULT;
+SELECT 'REPORT'           AS tbl, COUNT(*) AS rows FROM REPORT;
+SELECT 'SEMESTER_SESSION' AS tbl, COUNT(*) AS rows FROM SEMESTER_SESSION;
+SELECT 'NOTIFICATION'     AS tbl, COUNT(*) AS rows FROM NOTIFICATION;
+GO
+
+-- Detailed column checks
+SELECT studentID,   name, studentCode,  personalEmail, emergencyContactName  FROM STUDENT;
+SELECT lecturerID,  name, lecturerCode, personalEmail, department, staffType  FROM LECTURER;
+SELECT adminID,     name, adminCode                                            FROM HOP_ADMIN;
+SELECT enrolmentID, studentID, courseID, status                               FROM ENROLMENT;
+SELECT sessionID,   semesterName, status, enrolStartDate, enrolEndDate        FROM SEMESTER_SESSION;
+SELECT notificationID, recipientID, title, notifType, isRead                  FROM NOTIFICATION;
+SELECT resultID,    studentID, marks, grade, publishedStatus                  FROM RESULT;
+GO
+
+-- New columns from PATCH 8 + 9 (should return 8 rows)
+SELECT 'NOTIFICATION' AS tbl, COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'NOTIFICATION' AND COLUMN_NAME IN ('groupKey','senderID','courseID')
+UNION ALL
+SELECT 'STUDENT', COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME IN ('icNumber','phone','intakeSemester')
+UNION ALL
+SELECT 'LECTURER', COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME IN ('icNumber','phone')
+ORDER BY tbl, COLUMN_NAME;
+GO
+
+PRINT '=====================================================================';
+PRINT 'PATCH COMPLETE — All changes applied successfully';
+PRINT 'Share SIMS_DB_COMPLETE.sql with teammates doing fresh install';
+PRINT '=====================================================================';
+
+
+
+
+
+-- =====================================================================
+-- SIMS_DB PATCH 10 — STUDENT first-time OTP / account activation
+-- Safe to run multiple times. No tables dropped.
+-- Adds:
+--   otpCode      VARCHAR(6)  - the 6-digit one-time code (NULL once used)
+--   otpExpiry    DATETIME    - when the code stops being valid
+--   isActivated  BIT         - 0 = must verify OTP on first login, 1 = active
+-- Existing students are marked activated so they are NOT locked out.
+-- =====================================================================
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'otpCode')
+    ALTER TABLE STUDENT ADD otpCode VARCHAR(6) NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'otpExpiry')
+    ALTER TABLE STUDENT ADD otpExpiry DATETIME NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'STUDENT' AND COLUMN_NAME = 'isActivated')
+    ALTER TABLE STUDENT ADD isActivated BIT NOT NULL DEFAULT 0;
+GO
+
+-- Mark all pre-OTP students as activated (they have no pending code).
+-- Re-running this later is safe: students still waiting on a code keep
+-- a non-NULL otpCode, so they are skipped.
+UPDATE STUDENT SET isActivated = 1 WHERE isActivated = 0 AND otpCode IS NULL;
+GO
+
+PRINT 'PATCH 10 applied: otpCode / otpExpiry / isActivated ready.';
+GO
+
+-- Verify
+SELECT studentID, name, studentCode, email, personalEmail, isActivated, otpCode, otpExpiry
+FROM STUDENT
+ORDER BY studentID;
+GO
+
+
+
+
+-- =====================================================================
+-- SIMS_DB PATCH 11 — role identity fields
+-- Safe to run multiple times. No tables dropped.
+-- Adds:
+--   HOP_ADMIN.headOf       VARCHAR(100) - programme the HOP is Head of
+--   LECTURER.lecturerTitle VARCHAR(80)  - e.g. "Senior Lecturer of IT"
+-- Students need no new column: identity = their PROGRAMME.programmeName.
+-- =====================================================================
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'HOP_ADMIN' AND COLUMN_NAME = 'headOf')
+    ALTER TABLE HOP_ADMIN ADD headOf VARCHAR(100) NULL;
+GO
+
+UPDATE HOP_ADMIN SET headOf = 'Computer Science' WHERE adminID = 1 AND headOf IS NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'LECTURER' AND COLUMN_NAME = 'lecturerTitle')
+    ALTER TABLE LECTURER ADD lecturerTitle VARCHAR(80) NULL;
+GO
+
+UPDATE LECTURER SET lecturerTitle = 'Senior Lecturer of IT'            WHERE lecturerID = 1 AND lecturerTitle IS NULL;
+UPDATE LECTURER SET lecturerTitle = 'Lecturer of Software Engineering' WHERE lecturerID = 2 AND lecturerTitle IS NULL;
+UPDATE LECTURER SET lecturerTitle = 'Lecturer of Computer Science'     WHERE lecturerID = 3 AND lecturerTitle IS NULL;
+UPDATE LECTURER SET lecturerTitle = 'Senior Lecturer of Business'      WHERE lecturerID = 4 AND lecturerTitle IS NULL;
+GO
+
+PRINT 'PATCH 11 applied: HOP_ADMIN.headOf / LECTURER.lecturerTitle ready.';
+GO
+
+SELECT adminID, name, headOf FROM HOP_ADMIN;
+SELECT lecturerID, name, department, lecturerTitle FROM LECTURER;
+GO
+
+
+
+
+
+ALTER TABLE ENROLMENT ALTER COLUMN semester VARCHAR(30) NOT NULL;
+CHECK (recipientRole IN ('student','lecturer','all'))
+
+ALTER TABLE NOTIFICATION DROP CONSTRAINT chk_notif_role;
+
+ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_role 
+CHECK (recipientRole IN ('student','lecturer','admin','all'));
+
