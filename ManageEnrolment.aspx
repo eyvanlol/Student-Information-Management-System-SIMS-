@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageEnrolment.aspx.cs" Inherits="StudentManagementSystem.ManageEnrolment" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageEnrolment.aspx.cs" Inherits="StudentManagementSystem.ManageEnrolment" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -408,16 +408,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function showTab(tabId, btn) {
-        // Hide all panels
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        // Show selected
         document.getElementById(tabId).classList.add('active');
         btn.classList.add('active');
+        // Save active tab to cookie
+        document.cookie = "activeTab=" + tabId + ";path=/";
     }
 
-    // Auto-show alert message if present
     window.onload = function () {
+        // Restore active tab from cookie
+        var cookies = document.cookie.split(';');
+        var activeTab = 'tab-semester';
+        for (var i = 0; i < cookies.length; i++) {
+            var c = cookies[i].trim();
+            if (c.startsWith('activeTab=')) {
+                activeTab = c.substring('activeTab='.length);
+                break;
+            }
+        }
+        // Activate the saved tab
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        var panel = document.getElementById(activeTab);
+        if (panel) panel.classList.add('active');
+        // Find matching button and activate it
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(activeTab)) {
+                b.classList.add('active');
+            }
+        });
+
+        // Show alert message if present
     var msg = document.getElementById('<%= lblMessage.ClientID %>');
     if (msg && msg.innerText.trim() !== '') {
         msg.style.display = 'block';
