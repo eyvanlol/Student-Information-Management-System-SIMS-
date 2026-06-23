@@ -23,18 +23,6 @@ namespace StudentManagementSystem
             LoadAtRiskStudents(); // run every load so system always checks risk
         }
 
-        protected void gvLowAttendance_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            if (e.CommandName == "SendWarning")
-            {
-                int rowIndex = Convert.ToInt32(e.CommandArgument);
-                int studentID = Convert.ToInt32(gvLowAttendance.DataKeys[rowIndex].Value);
-
-                // Your logic here to send warning to student
-                lblSystemMessage.Text = "Warning sent to student.";
-                pnlMessage.Visible = true;
-            }
-        }
         private void LoadAtRiskStudents()
         {
             int lecturerID = Convert.ToInt32(Session["UserID"]);

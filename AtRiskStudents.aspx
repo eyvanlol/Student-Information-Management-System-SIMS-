@@ -123,8 +123,7 @@
                     </div>
                     <div class="card-body p-0">
                         <asp:GridView ID="gvLowAttendance" runat="server" AutoGenerateColumns="False" 
-                            CssClass="table-custom" GridLines="None" DataKeyNames="studentID"
-                            OnRowCommand="gvLowAttendance_RowCommand">
+                            CssClass="table-custom" GridLines="None" DataKeyNames="studentID">
                             <Columns>
                                 <asp:BoundField DataField="studentCode" HeaderText="Student ID" />
                                 <asp:BoundField DataField="name" HeaderText="Student Name" />
@@ -135,8 +134,6 @@
                                     </ItemTemplate>
                                 </asp:TemplateField>
                                 <asp:BoundField DataField="absentDates" HeaderText="Dates Missed" />
-                                <asp:ButtonField CommandName="SendWarning" Text="<i class='fas fa-bell'></i> Warn" 
-                                    ControlStyle-CssClass="btn btn-sm btn-danger rounded-pill px-3" />
                             </Columns>
                             <EmptyDataTemplate>
                                 <div class="text-center p-4 text-muted">
