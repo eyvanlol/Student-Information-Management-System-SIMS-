@@ -37,6 +37,7 @@ namespace StudentManagementSystem
                     c.courseCode,
                     c.courseName,
                     a.attendanceDate,
+                    a.SessionType,
                     a.status
                 FROM ATTENDANCE a
                 INNER JOIN COURSE c ON a.courseID = c.courseID
