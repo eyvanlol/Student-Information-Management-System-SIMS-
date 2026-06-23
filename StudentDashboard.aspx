@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,23 +15,23 @@
         /* ── SIDEBAR ── */
         .sidebar {
             width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #1a5fa8 0%, #2980b9 100%);
+            background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
             color: white; z-index: 1000; overflow-y: auto;
         }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.15); }
+        .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .sidebar-header h4 { font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-header small { color: rgba(255,255,255,0.65); font-size: 0.75rem; }
+        .sidebar-header small { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
         .nav-item { padding: 0; }
         .nav-link {
-            color: rgba(255,255,255,0.8); padding: 13px 25px; display: flex; align-items: center;
+            color: rgba(255,255,255,0.7); padding: 14px 25px; display: flex; align-items: center;
             text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; font-size: 0.9rem;
         }
         .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.15); color: white; border-left-color: #fff;
+            background: rgba(26,188,156,0.15); color: white; border-left-color: #1abc9c;
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.15); }
+        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.08); }
 
         /* ── MAIN ── */
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
@@ -71,7 +71,7 @@
             width: 56px; height: 56px; border-radius: 14px; display: flex;
             align-items: center; justify-content: center; font-size: 1.4rem; color: white; flex-shrink: 0;
         }
-        .icon-blue   { background: linear-gradient(135deg, #1a5fa8, #2980b9); }
+        .icon-blue   { background: linear-gradient(135deg, #16a085, #1abc9c); }
         .icon-green  { background: linear-gradient(135deg, #27ae60, #229954); }
         .icon-orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
         .icon-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
@@ -113,7 +113,7 @@
 
         /* ── WELCOME BANNER ── */
         .welcome-banner {
-            background: linear-gradient(135deg, #1a5fa8, #2980b9);
+            background: linear-gradient(135deg, #16a085, #1abc9c);
             border-radius: 15px; padding: 24px 28px; color: white;
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 24px;
@@ -140,7 +140,7 @@
     <!-- ── SIDEBAR ── -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div style="width:50px;height:50px;background:rgba(255,255,255,0.2);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;">
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;">
                 <i class="fas fa-user-graduate"></i>
             </div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Student"></asp:Label></h4>
@@ -164,14 +164,14 @@
     <!-- ── MAIN CONTENT ── -->
     <div class="main-content">
         <div class="topbar">
-            <h2><i class="fas fa-home me-2 text-primary"></i>Student Dashboard</h2>
+            <h2><i class="fas fa-home me-2" style="color:#1abc9c;"></i>Student Dashboard</h2>
             <div class="topbar-actions">
                 <div class="notification-bell">
                     <i class="fas fa-bell text-muted"></i>
                     <span class="badge"><asp:Label ID="lblBellCount" runat="server" Text="0"></asp:Label></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
+                        <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
                         </div>
                         <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
@@ -316,3 +316,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
