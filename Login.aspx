@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f8c8b0 0%, #e8e4f0 50%, #d4d0e8 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -18,7 +18,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .login-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
@@ -27,7 +27,7 @@
             min-height: 600px;
         }
         .login-left {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #e8a88a 0%, #d4a5d4 100%);
             color: white;
             padding: 60px 40px;
             display: flex;
@@ -48,31 +48,34 @@
         .login-right {
             padding: 60px 50px;
             display: flex; flex-direction: column; justify-content: center;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
         }
-        .login-right h2 { color: #2c3e50; font-weight: 700; margin-bottom: 10px; }
-        .login-right .subtitle { color: #7f8c8d; margin-bottom: 35px; }
+        .login-right h2 { color: #2c3e50; font-weight: 700; margin-bottom: 10px; text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
+        .login-right .subtitle { color: #5a6c7d; margin-bottom: 35px; font-weight: 500; }
         .form-floating { margin-bottom: 20px; }
         .form-floating .form-control {
-            border-radius: 12px; border: 2px solid #e0e0e0; padding-left: 45px;
+            border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.4); padding-left: 45px;
+            background: rgba(255, 255, 255, 0.2); color: #2c3e50;
         }
+        .form-floating .form-control::placeholder { color: rgba(44, 62, 80, 0.6); }
         .form-floating .form-control:focus {
-            border-color: #3498db; box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: #e07a5f; box-shadow: 0 0 0 0.2rem rgba(224, 122, 95, 0.25);
         }
         .input-icon {
             position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
             color: #95a5a6; z-index: 10;
         }
         .btn-login {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border: none;
+            background: linear-gradient(135deg, #e07a5f 0%, #d4a5d4 100%); border: none;
             border-radius: 12px; padding: 15px; font-weight: 600; font-size: 1rem;
             color: white; width: 100%; margin-top: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .btn-login:hover {
-            transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+            transform: translateY(-2px); box-shadow: 0 8px 25px rgba(224, 122, 95, 0.4);
         }
         .forgot-password { text-align: center; margin-top: 20px; color: #7f8c8d; }
-        .forgot-password a { color: #3498db; text-decoration: none; font-weight: 600; }
+        .forgot-password a { color: #e07a5f; text-decoration: none; font-weight: 600; }
         .system-badge {
             display: inline-block; background: rgba(255,255,255,0.2);
             padding: 8px 20px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 20px;
@@ -84,8 +87,8 @@
         .alert-error { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6cb; }
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .demo-creds {
-            background: #f8f9fa; border-radius: 10px; padding: 15px; margin-top: 20px;
-            font-size: 0.8rem; color: #6c757d;
+            background: rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 15px; margin-top: 20px;
+            font-size: 0.8rem; color: #5a6c7d; border: 1px solid rgba(255, 255, 255, 0.3);
         }
         .demo-creds strong { color: #2c3e50; }
         @media (max-width: 768px) {
@@ -127,25 +130,51 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="form-check">
-                            <asp:CheckBox ID="chkRemember" runat="server" CssClass="form-check-input" />
-                            <label class="form-check-label" for="chkRemember">Remember me</label>
-                        </div>
-                    </div>
+
 
                     <asp:Button ID="btnLogin" runat="server" Text="Sign In" CssClass="btn btn-login" OnClick="btnLogin_Click" />
 
                     <div class="forgot-password">
-                        <span class="text-muted"><i class="fas fa-key me-1"></i>Forgot your password? Contact your administrator.</span>
+                        <a href="javascript:void(0);" onclick="showContactAdminModal();" style="color: #e07a5f; text-decoration: none; font-weight: 600;">
+                            <i class="fas fa-key me-1"></i>Forgot your password?
+                        </a>
                     </div>
 
-                    <div class="demo-creds">
-                        <strong><i class="fas fa-info-circle me-1"></i>Demo Credentials:</strong><br/>
-                        <b>Admin:</b> admin@college.edu / admin123<br/>
-                        <b>Lecturer:</b> lecturer@college.edu / lecturer123<br/>
-                        <b>Student:</b> student@college.edu / student123
+                    <!-- Contact Admin Modal -->
+                    <div id="contactAdminModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); align-items: center; justify-content: center;">
+                        <div style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 40px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease;">
+                            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #e07a5f, #d4a5d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 1.8rem;">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 15px;">Contact Administrator</h4>
+                            <p style="color: #7f8c8d; margin-bottom: 25px; line-height: 1.6;">Please contact the admin to reset your password.</p>
+                            <button onclick="hideContactAdminModal();" style="background: linear-gradient(135deg, #e07a5f 0%, #d4a5d4 100%); border: none; border-radius: 12px; padding: 12px 40px; font-weight: 600; color: white; cursor: pointer; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(224, 122, 95, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                I Understand
+                            </button>
+                        </div>
                     </div>
+
+                    <style>
+                        @keyframes modalSlideIn {
+                            from { transform: translateY(-50px); opacity: 0; }
+                            to { transform: translateY(0); opacity: 1; }
+                        }
+                    </style>
+
+                    <script>
+                        function showContactAdminModal() {
+                            document.getElementById('contactAdminModal').style.display = 'flex';
+                        }
+                        function hideContactAdminModal() {
+                            document.getElementById('contactAdminModal').style.display = 'none';
+                        }
+                        // Close modal when clicking outside
+                        document.getElementById('contactAdminModal').addEventListener('click', function (e) {
+                            if (e.target === this) hideContactAdminModal();
+                        });
+                    </script>
+
+
                 </div>
             </div>
         </div>
