@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Web.UI.WebControls;
 
 namespace StudentManagementSystem
 {
@@ -18,25 +17,26 @@ namespace StudentManagementSystem
             if (!IsPostBack)
             {
                 lblUserName.Text = Session["UserName"] != null ? Session["UserName"].ToString() : "Lecturer";
-                LoadAtRiskStudents();
             }
+
+            LoadAtRiskStudents(); // run every load so system always checks risk
         }
 
         private void LoadAtRiskStudents()
         {
             int lecturerID = Convert.ToInt32(Session["UserID"]);
 
-            // Calculate real attendance rate from ATTENDANCE table
             string sql = @"
                 SELECT
                     s.studentID,
                     s.studentCode,
                     s.name,
+                    c.courseID,
                     c.courseCode,
                     c.courseName,
                     CAST(
-                        COUNT(CASE WHEN a.status = 'Present' THEN 1 END) * 100.0
-                        / NULLIF(COUNT(a.attendanceID), 0)
+                        COUNT(CASE WHEN a.status = 'Present' THEN 1 END) * 100.0 /
+                        NULLIF(COUNT(a.attendanceID), 0)
                     AS DECIMAL(5,1)) AS attendanceRate,
                     ISNULL(
                         STUFF((
@@ -45,79 +45,101 @@ namespace StudentManagementSystem
                             WHERE a2.studentID = s.studentID
                               AND a2.courseID  = c.courseID
                               AND a2.status    = 'Absent'
-                            ORDER BY a2.attendanceDate
                             FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)')
                         , 1, 2, '')
-                    , 'None recorded') AS absentDates
+                    , 'None') AS absentDates
                 FROM ENROLMENT e
-                INNER JOIN STUDENT s  ON e.studentID  = s.studentID
-                INNER JOIN COURSE  c  ON e.courseID   = c.courseID
-                INNER JOIN ATTENDANCE a ON a.studentID = s.studentID
-                                       AND a.courseID  = c.courseID
+                INNER JOIN STUDENT s ON e.studentID = s.studentID
+                INNER JOIN COURSE c ON e.courseID = c.courseID
+                INNER JOIN ATTENDANCE a ON a.studentID = s.studentID AND a.courseID = c.courseID
                 WHERE c.lecturerID = @lecturerID
-                  AND e.status IN ('enrolled', 'confirmed')
+                  AND e.status IN ('enrolled','confirmed')
                 GROUP BY s.studentID, s.studentCode, s.name, c.courseID, c.courseCode, c.courseName
                 HAVING CAST(
-                    COUNT(CASE WHEN a.status = 'Present' THEN 1 END) * 100.0
-                    / NULLIF(COUNT(a.attendanceID), 0)
-                AS DECIMAL(5,1)) < 85
+                    COUNT(CASE WHEN a.status = 'Present' THEN 1 END) * 100.0 /
+                    NULLIF(COUNT(a.attendanceID), 0)
+                AS DECIMAL(5,1)) < 80
                 ORDER BY attendanceRate ASC";
 
             DataTable dt = new DataTable();
-            try
+
+            using (SqlConnection conn = DbHelper.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
             {
-                using (SqlConnection conn = DbHelper.GetConnection())
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                {
-                    cmd.Parameters.AddWithValue("@lecturerID", lecturerID);
-                    da.Fill(dt);
-                }
-            }
-            catch (SqlException ex)
-            {
-                lblSystemMessage.Text = "Error loading data: " + ex.Message;
-                pnlMessage.Visible = true;
-                pnlMessage.CssClass = "alert alert-danger fw-bold shadow-sm";
+                cmd.Parameters.AddWithValue("@lecturerID", lecturerID);
+                da.Fill(dt);
             }
 
+            // Bind grid
             gvLowAttendance.DataSource = dt;
             gvLowAttendance.DataBind();
+
+            // ===========================
+            // AUTO NOTIFICATION ENGINE
+            // ===========================
+            foreach (DataRow row in dt.Rows)
+            {
+                int studentID = Convert.ToInt32(row["studentID"]);
+                int courseID = Convert.ToInt32(row["courseID"]);
+                string studentName = row["name"].ToString();
+                string courseCode = row["courseCode"].ToString();
+
+                // prevent duplicate spam (IMPORTANT)
+                if (!HasAlreadySentWarning(studentID, courseID))
+                {
+                    NotificationHelper.Insert(
+                        recipientID: studentID,
+                        recipientRole: NotificationHelper.Role.Student,
+                        notifType: NotificationHelper.Type.Attendance,
+                        title: "Attendance Alert — " + courseCode,
+                        message: "Your attendance for " + courseCode +
+                                 " has dropped below 80%. Please improve attendance immediately.",
+                        senderID: lecturerID
+                    );
+
+                    SaveWarningLog(studentID, courseID);
+                }
+            }
         }
 
-        protected void gvLowAttendance_RowCommand(object sender, GridViewCommandEventArgs e)
+        // ===========================
+        // PREVENT DUPLICATE ALERTS
+        // ===========================
+        private bool HasAlreadySentWarning(int studentID, int courseID)
         {
-            if (e.CommandName == "SendWarning")
+            using (SqlConnection conn = DbHelper.GetConnection())
             {
-                int index = Convert.ToInt32(e.CommandArgument);
-                GridViewRow row = gvLowAttendance.Rows[index];
+                string sql = @"
+                    SELECT COUNT(*)
+                    FROM ATTENDANCE_WARNING_LOG
+                    WHERE studentID = @studentID
+                      AND courseID = @courseID";
 
-                // Get studentID safely from DataKeys
-                int studentID = Convert.ToInt32(gvLowAttendance.DataKeys[index].Value);
-                int lecturerID = Convert.ToInt32(Session["UserID"]);
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@studentID", studentID);
+                cmd.Parameters.AddWithValue("@courseID", courseID);
 
-                string studentName = row.Cells[1].Text;
-                string courseCode = row.Cells[2].Text;
+                conn.Open();
+                int count = (int)cmd.ExecuteScalar();
+                return count > 0;
+            }
+        }
 
-                // Send real notification to the student via NotificationHelper
-                NotificationHelper.Insert(
-                    recipientID: studentID,
-                    recipientRole: NotificationHelper.Role.Student,
-                    notifType: NotificationHelper.Type.Attendance,
-                    title: "Attendance Warning — " + courseCode,
-                    message: "Dear " + studentName + ", your attendance for " + courseCode +
-                                   " has dropped below 85%. Please attend all remaining classes " +
-                                   "and contact your lecturer if you have any concerns.",
-                    senderID: lecturerID
-                );
+        private void SaveWarningLog(int studentID, int courseID)
+        {
+            using (SqlConnection conn = DbHelper.GetConnection())
+            {
+                string sql = @"
+                    INSERT INTO ATTENDANCE_WARNING_LOG(studentID, courseID, sentDate)
+                    VALUES(@studentID, @courseID, GETDATE())";
 
-                lblSystemMessage.Text = "<i class='fas fa-check-circle me-2'></i>Warning notification sent to <strong>"
-                                      + studentName + "</strong> for <strong>" + courseCode + "</strong>.";
-                pnlMessage.Visible = true;
-                pnlMessage.CssClass = "alert alert-success alert-dismissible fade show fw-bold shadow-sm";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@studentID", studentID);
+                cmd.Parameters.AddWithValue("@courseID", courseID);
 
-                // Reload so the grid stays fresh
-                LoadAtRiskStudents();
+                conn.Open();
+                cmd.ExecuteNonQuery();
             }
         }
 

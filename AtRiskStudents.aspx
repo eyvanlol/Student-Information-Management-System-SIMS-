@@ -119,7 +119,7 @@
 
                 <div class="content-card">
                     <div class="card-header">
-                        <h5><i class="fas fa-users me-2 text-danger"></i>Students with Low Attendance (< 85%)</h5>
+                        <h5><i class="fas fa-users me-2 text-danger"></i>Students with Low Attendance (< 80%)</h5>
                     </div>
                     <div class="card-body p-0">
                         <asp:GridView ID="gvLowAttendance" runat="server" AutoGenerateColumns="False" 
