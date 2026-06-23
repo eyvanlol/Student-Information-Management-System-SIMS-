@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentEnrolment.aspx.cs" Inherits="StudentManagementSystem.StudentEnrolment" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentEnrolment.aspx.cs" Inherits="StudentManagementSystem.StudentEnrolment" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -205,7 +205,6 @@
                             runat="server"
                             AutoGenerateColumns="false"
                             CssClass="table-custom"
-                            OnRowCommand="gvUpcoming_RowCommand"
                             EmptyDataText="No courses assigned for upcoming semester yet."
                             EmptyDataRowStyle-CssClass="text-center p-4 text-muted">
                             <Columns>
@@ -227,11 +226,6 @@
                                 </asp:TemplateField>
                             </Columns>
                         </asp:GridView>
-                    </div>
-                    <div style="padding:14px 20px;background:#f8f9fa;font-size:0.82rem;color:#7f8c8d;border-top:1px solid #f0f0f0;">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Click <strong>Confirm all courses</strong> to enrol. Use <strong>Drop</strong> on individual courses to request a drop before confirming.
-                        Drop requests require HOP approval.
                     </div>
                 </div>
             </asp:Panel>
