@@ -20,8 +20,20 @@ namespace StudentManagementSystem
 
             if (Session["UserName"] != null)
             {
-                lblUserName.Text    = Session["UserName"].ToString();
+                lblUserName.Text = Session["UserName"].ToString();
                 lblTopUserName.Text = Session["UserName"].ToString();
+            }
+
+            // Handle drop button postback (plain HTML submit button)
+            if (IsPostBack && Request.Form["dropBtn"] != null)
+            {
+                string dropVal = Request.Form["dropBtn"];
+                if (!string.IsNullOrEmpty(dropVal))
+                {
+                    int enrolmentId = Convert.ToInt32(dropVal);
+                    ProcessDropRequest(enrolmentId);
+                    return;
+                }
             }
 
             if (!IsPostBack)
@@ -102,6 +114,7 @@ namespace StudentManagementSystem
                 string sql = @"
                     SELECT TOP 1 semesterName, academicYear, enrolStartDate, enrolEndDate, status
                     FROM   SEMESTER_SESSION
+                    WHERE  status = 'Open'
                     ORDER  BY sessionID DESC";
 
                 using (SqlConnection conn = DbHelper.GetConnection())
@@ -112,33 +125,28 @@ namespace StudentManagementSystem
                     {
                         if (r.Read())
                         {
-                            string status    = r["status"].ToString();
-                            string semName   = r["semesterName"].ToString();
-                            string acYear    = r["academicYear"].ToString();
-                            string startDate = Convert.ToDateTime(r["enrolStartDate"]).ToString("d MMM yyyy");
-                            string endDate   = Convert.ToDateTime(r["enrolEndDate"]).ToString("d MMM yyyy");
+                            string semName = r["semesterName"].ToString();
+                            string acYear = r["academicYear"].ToString();
+                            string endDate = Convert.ToDateTime(r["enrolEndDate"]).ToString("d MMM yyyy");
 
-                            if (status == "Open")
-                            {
-                                pnlWindowOpen.Visible   = true;
-                                pnlWindowClosed.Visible = false;
-                                lblWindowDetails.Text   = semName + " " + acYear +
-                                    " · Deadline: " + endDate;
-                            }
-                            else
-                            {
-                                pnlWindowOpen.Visible   = false;
-                                pnlWindowClosed.Visible = true;
-
-                                // Hide confirm button if window is closed
-                                btnConfirmAll.Visible = false;
-                            }
+                            pnlWindowOpen.Visible = true;
+                            pnlWindowClosed.Visible = false;
+                            lblWindowDetails.Text = semName + " " + acYear +
+                                " · Deadline: " + endDate +
+                                " — You can confirm your courses or submit drop requests.";
+                        }
+                        else
+                        {
+                            pnlWindowOpen.Visible = false;
+                            pnlWindowClosed.Visible = true;
+                            btnConfirmAll.Visible = false;
                         }
                     }
                 }
             }
             catch
             {
+                pnlWindowOpen.Visible = false;
                 pnlWindowClosed.Visible = true;
             }
         }
@@ -150,13 +158,15 @@ namespace StudentManagementSystem
         {
             try
             {
-                // Get the most recent OPEN semester
                 string semSql = @"
                     SELECT TOP 1 semesterName, academicYear
-                    FROM   SEMESTER_SESSION WHERE status = 'Open'
+                    FROM   SEMESTER_SESSION
+                    WHERE  status = 'Open'
                     ORDER  BY sessionID DESC";
 
-                string semName = ""; string acYear = "";
+                string semName = "";
+                string acYear = "";
+
                 using (SqlConnection conn = DbHelper.GetConnection())
                 using (SqlCommand cmd = new SqlCommand(semSql, conn))
                 {
@@ -166,7 +176,7 @@ namespace StudentManagementSystem
                         if (r.Read())
                         {
                             semName = r["semesterName"].ToString();
-                            acYear  = r["academicYear"].ToString();
+                            acYear = r["academicYear"].ToString();
                         }
                     }
                 }
@@ -202,9 +212,13 @@ namespace StudentManagementSystem
 
                 if (dt.Rows.Count > 0)
                 {
-                    pnlUpcoming.Visible    = true;
-                    gvUpcoming.DataSource  = dt;
+                    pnlUpcoming.Visible = true;
+                    gvUpcoming.DataSource = dt;
                     gvUpcoming.DataBind();
+                }
+                else
+                {
+                    pnlUpcoming.Visible = false;
                 }
             }
             catch { }
@@ -242,7 +256,6 @@ namespace StudentManagementSystem
                         da.Fill(dt);
                 }
 
-                // Set current semester label from first row
                 if (dt.Rows.Count > 0)
                     lblCurrentSemester.Text = dt.Rows[0]["semester"].ToString();
                 else
@@ -285,12 +298,97 @@ namespace StudentManagementSystem
 
                 if (dt.Rows.Count > 0)
                 {
-                    pnlDropRequests.Visible    = true;
-                    gvDropRequests.DataSource  = dt;
+                    pnlDropRequests.Visible = true;
+                    gvDropRequests.DataSource = dt;
                     gvDropRequests.DataBind();
+                }
+                else
+                {
+                    pnlDropRequests.Visible = false;
                 }
             }
             catch { }
+        }
+
+        // ══════════════════════════════════════════════════════
+        // PROCESS DROP REQUEST — called from plain HTML button
+        // ══════════════════════════════════════════════════════
+        private void ProcessDropRequest(int enrolmentId)
+        {
+            if (!IsWindowOpen())
+            {
+                ShowMessage("Enrolment window is closed. Drop requests cannot be submitted.", false);
+                LoadEnrolmentPage();
+                return;
+            }
+
+            int studentId = Convert.ToInt32(Session["UserID"]);
+
+            using (SqlConnection conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                using (SqlTransaction tx = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Update status to drop_requested
+                        using (SqlCommand cmd = new SqlCommand(
+                            @"UPDATE ENROLMENT SET status = 'drop_requested'
+                              WHERE  enrolmentID = @eid AND studentID = @sid
+                              AND    status IN ('pending','enrolled')", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@eid", enrolmentId);
+                            cmd.Parameters.AddWithValue("@sid", studentId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // 2. Get course name for notification
+                        string courseName = "";
+                        using (SqlCommand cmd = new SqlCommand(
+                            @"SELECT c.courseName FROM ENROLMENT e
+                              JOIN   COURSE c ON e.courseID = c.courseID
+                              WHERE  e.enrolmentID = @eid", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@eid", enrolmentId);
+                            object r = cmd.ExecuteScalar();
+                            courseName = r != null ? r.ToString() : "course";
+                        }
+
+                        // 3. Get admin ID
+                        int adminId = 1;
+                        using (SqlCommand cmd = new SqlCommand(
+                            "SELECT TOP 1 adminID FROM HOP_ADMIN", conn, tx))
+                        {
+                            object r = cmd.ExecuteScalar();
+                            if (r != null) adminId = Convert.ToInt32(r);
+                        }
+
+                        // 4. Notify admin
+                        using (SqlCommand cmd = new SqlCommand(
+                            @"INSERT INTO NOTIFICATION
+                                (recipientID, recipientRole, title, message, isRead, createdAt, notifType)
+                              VALUES
+                                (@rid, 'admin', @title, @msg, 0, GETDATE(), 'drop_requested')", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@rid", adminId);
+                            cmd.Parameters.AddWithValue("@title", "Drop request — " + courseName);
+                            cmd.Parameters.AddWithValue("@msg",
+                                Session["UserName"] + " has submitted a drop request for " + courseName + ".");
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        ShowMessage("Drop request submitted for " + courseName + ". Awaiting HOP approval.", true);
+                    }
+                    catch (Exception ex)
+                    {
+                        tx.Rollback();
+                        ShowMessage("Error: " + ex.Message, false);
+                    }
+                }
+            }
+
+            LoadEnrolmentPage();
         }
 
         // ══════════════════════════════════════════════════════
@@ -298,7 +396,6 @@ namespace StudentManagementSystem
         // ══════════════════════════════════════════════════════
         protected void btnConfirmAll_Click(object sender, EventArgs e)
         {
-            // Check window is still open
             if (!IsWindowOpen())
             {
                 ShowMessage("Enrolment window is closed. You cannot confirm courses at this time.", false);
@@ -329,90 +426,6 @@ namespace StudentManagementSystem
         }
 
         // ══════════════════════════════════════════════════════
-        // DROP INDIVIDUAL COURSE
-        // ══════════════════════════════════════════════════════
-        protected void gvUpcoming_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            if (e.CommandName != "DropCourse") return;
-
-            // Check window is open
-            if (!IsWindowOpen())
-            {
-                ShowMessage("Enrolment window is closed. Drop requests cannot be submitted.", false);
-                return;
-            }
-
-            int enrolmentId = Convert.ToInt32(e.CommandArgument);
-            int studentId   = Convert.ToInt32(Session["UserID"]);
-
-            using (SqlConnection conn = DbHelper.GetConnection())
-            {
-                conn.Open();
-                using (SqlTransaction tx = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        // 1. Update ENROLMENT status to drop_requested
-                        using (SqlCommand cmd = new SqlCommand(
-                            @"UPDATE ENROLMENT SET status = 'drop_requested'
-                              WHERE  enrolmentID = @eid AND studentID = @sid
-                              AND    status IN ('pending','enrolled')", conn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@eid", enrolmentId);
-                            cmd.Parameters.AddWithValue("@sid", studentId);
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        // 2. Get course name for notification
-                        string courseName = "";
-                        using (SqlCommand cmd = new SqlCommand(
-                            @"SELECT c.courseName FROM ENROLMENT e
-                              JOIN   COURSE c ON e.courseID = c.courseID
-                              WHERE  e.enrolmentID = @eid", conn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@eid", enrolmentId);
-                            object r = cmd.ExecuteScalar();
-                            courseName = r != null ? r.ToString() : "course";
-                        }
-
-                        // 3. Insert notification for HOP (admin)
-                        // Get adminID from HOP_ADMIN table
-                        int adminId = 1;
-                        using (SqlCommand cmd = new SqlCommand(
-                            "SELECT TOP 1 adminID FROM HOP_ADMIN", conn, tx))
-                        {
-                            object r = cmd.ExecuteScalar();
-                            if (r != null) adminId = Convert.ToInt32(r);
-                        }
-
-                        using (SqlCommand cmd = new SqlCommand(
-                            @"INSERT INTO NOTIFICATION
-                                (recipientID, recipientRole, title, message, isRead, createdAt, notifType)
-                              VALUES
-                                (@rid, 'admin', @title, @msg, 0, GETDATE(), 'drop_requested')", conn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@rid",   adminId);
-                            cmd.Parameters.AddWithValue("@title", "Drop request — " + courseName);
-                            cmd.Parameters.AddWithValue("@msg",
-                                Session["UserName"] + " has submitted a drop request for " + courseName + ".");
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        tx.Commit();
-                        ShowMessage("Drop request submitted for " + courseName + ". Awaiting HOP approval.", true);
-                    }
-                    catch (Exception ex)
-                    {
-                        tx.Rollback();
-                        ShowMessage("Error: " + ex.Message, false);
-                    }
-                }
-            }
-
-            LoadEnrolmentPage();
-        }
-
-        // ══════════════════════════════════════════════════════
         // CHECK WINDOW IS OPEN
         // ══════════════════════════════════════════════════════
         private bool IsWindowOpen()
@@ -437,13 +450,13 @@ namespace StudentManagementSystem
         {
             switch (status)
             {
-                case "enrolled":       return "badge-enrolled";
-                case "pending":        return "badge-pending";
-                case "confirmed":      return "badge-confirmed";
-                case "dropped":        return "badge-dropped";
-                case "rejected":       return "badge-rejected";
+                case "enrolled": return "badge-enrolled";
+                case "pending": return "badge-pending";
+                case "confirmed": return "badge-confirmed";
+                case "dropped": return "badge-dropped";
+                case "rejected": return "badge-rejected";
                 case "drop_requested": return "badge-drop-req";
-                default:               return "badge-pending";
+                default: return "badge-pending";
             }
         }
 
@@ -451,13 +464,13 @@ namespace StudentManagementSystem
         {
             switch (status)
             {
-                case "enrolled":       return "Enrolled";
-                case "pending":        return "Pending confirmation";
-                case "confirmed":      return "Confirmed";
-                case "dropped":        return "Dropped";
-                case "rejected":       return "Rejected";
+                case "enrolled": return "Enrolled";
+                case "pending": return "Pending confirmation";
+                case "confirmed": return "Confirmed";
+                case "dropped": return "Dropped";
+                case "rejected": return "Rejected";
                 case "drop_requested": return "Drop requested";
-                default:               return status;
+                default: return status;
             }
         }
 
@@ -467,20 +480,22 @@ namespace StudentManagementSystem
                 return "<span class=\"badge-drop-req\">Drop requested</span>";
             if (status == "dropped")
                 return "<span class=\"badge-dropped\">Dropped</span>";
+            if (status == "rejected")
+                return "<span class=\"badge-rejected\">Rejected</span>";
 
-            // Only show drop button if window is open
-            return $"<asp:LinkButton runat='server' CommandName='DropCourse' CommandArgument='{enrolmentId}' " +
-                   $"CssClass='btn-drop' OnClientClick=\"return confirm('Submit drop request for this course?');\">Drop</asp:LinkButton>";
+            return $"<button type='submit' name='dropBtn' value='{enrolmentId}' " +
+                   $"class='btn-drop' " +
+                   $"onclick=\"return confirm('Submit drop request for this course?');\">Drop</button>";
         }
 
         public string GetDropResult(string status)
         {
             switch (status)
             {
-                case "drop_requested": return "<span style='color:#7e5109;font-size:0.82rem;'>⏳ Awaiting HOP decision</span>";
-                case "dropped":        return "<span style='color:#155724;font-size:0.82rem;'>✅ Approved by HOP</span>";
-                case "rejected":       return "<span style='color:#721c24;font-size:0.82rem;'>❌ Rejected by HOP</span>";
-                default:               return "—";
+                case "drop_requested": return "<span style='color:#7e5109;font-size:0.82rem;'>&#9203; Awaiting HOP decision</span>";
+                case "dropped": return "<span style='color:#155724;font-size:0.82rem;'>&#10003; Approved by HOP</span>";
+                case "rejected": return "<span style='color:#721c24;font-size:0.82rem;'>&#10007; Rejected by HOP</span>";
+                default: return "—";
             }
         }
 
@@ -489,7 +504,7 @@ namespace StudentManagementSystem
         // ══════════════════════════════════════════════════════
         private void ShowMessage(string text, bool success)
         {
-            lblMessage.Text     = "<i class='fas fa-" + (success ? "check" : "exclamation") + "-circle me-2'></i>" + text;
+            lblMessage.Text = "<i class='fas fa-" + (success ? "check" : "exclamation") + "-circle me-2'></i>" + text;
             lblMessage.CssClass = "alert-msg " + (success ? "alert-success-custom" : "alert-danger-custom");
         }
 
