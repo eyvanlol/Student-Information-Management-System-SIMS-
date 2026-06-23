@@ -33,16 +33,16 @@ namespace StudentManagementSystem
         private void LoadAttendance(int studentID)
         {
             string sql = @"
-                SELECT 
-                    c.courseCode,
-                    c.courseName,
-                    a.attendanceDate,
-                    a.SessionType,
-                    a.status
-                FROM ATTENDANCE a
-                INNER JOIN COURSE c ON a.courseID = c.courseID
-                WHERE a.studentID = @studentID
-                ORDER BY a.attendanceDate DESC";
+                    SELECT 
+                        c.courseCode,
+                        c.courseName,
+                        a.attendanceDate,
+                        a.sessionType,
+                        a.status
+                    FROM ATTENDANCE a
+                    INNER JOIN COURSE c ON a.courseID = c.courseID
+                    WHERE a.studentID = @studentID
+                    ORDER BY a.attendanceDate DESC";
 
             gvAttendance.DataSource = GetData(sql, studentID);
             gvAttendance.DataBind();
