@@ -63,6 +63,40 @@ namespace StudentManagementSystem
             }
         }
 
+        // Resolves the Head-of-Programme identity line ("Head of Programme, <area>")
+        // so every admin page shows the same text as the dashboard instead of a
+        // hardcoded "Administrator". Cached in Session, so the lookup runs at most
+        // once per login and reflects any value saved on the dashboard.
+        public static string GetRoleIdentity(System.Web.SessionState.HttpSessionState session)
+        {
+            if (session == null) return "Head of Programme";
+
+            object cached = session["RoleIdentity"];
+            if (cached != null && !string.IsNullOrEmpty(cached.ToString()))
+                return cached.ToString();
+
+            string identity = "Head of Programme";
+            try
+            {
+                if (session["UserID"] != null)
+                {
+                    object o = ExecuteScalar(
+                        "SELECT headOf FROM HOP_ADMIN WHERE adminID = @id",
+                        new SqlParameter("@id", System.Convert.ToInt32(session["UserID"])));
+                    string h = (o == null || o == System.DBNull.Value) ? "" : o.ToString();
+                    if (!string.IsNullOrEmpty(h))
+                        identity = "Head of Programme, " + h;
+                }
+            }
+            catch
+            {
+                // headOf column not present yet -> keep default.
+            }
+
+            session["RoleIdentity"] = identity;
+            return identity;
+        }
+
         // Parameterised single-value query (e.g. COUNT(*), SCOPE_IDENTITY()).
         public static object ExecuteScalar(string sql, params SqlParameter[] parameters)
         {

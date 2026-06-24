@@ -131,6 +131,7 @@
     <Content Include="Reports.aspx" />
     <Content Include="SIMS_DB_PATCH10_otp.sql" />
     <Content Include="SIMS_DB_PATCH11_identity.sql" />
+    <Content Include="SIMS_DB_PATCH12_enrolment_autoid.sql" />
     <Content Include="StudentAttendance.aspx" />
     <Content Include="StudentDashboard.aspx" />
     <Content Include="StudentEnrolment.aspx" />

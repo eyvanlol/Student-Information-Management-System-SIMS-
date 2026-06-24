@@ -15,9 +15,9 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header {
             padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -39,8 +39,9 @@
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
+            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 

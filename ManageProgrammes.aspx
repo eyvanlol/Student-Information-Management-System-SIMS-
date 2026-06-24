@@ -5,7 +5,7 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manage Programmes - Head of Programme</title>
+    <title>Academic Programmes - Head of Programme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
     <style>
@@ -14,9 +14,9 @@
 
         /* Sidebar (matches AdminDashboard) */
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -29,7 +29,8 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: #3498db; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         /* Main */
         .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
@@ -39,6 +40,8 @@
         }
         .topbar h2 { font-size: 1.4rem; color: #2c3e50; margin: 0; }
         .topbar-actions { display: flex; align-items: center; gap: 15px; }
+        .notification-bell { position: relative; width: 40px; height: 40px; border-radius: 50%; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .notification-bell:hover { background: #e9ecef; }
         .user-dropdown { display: flex; align-items: center; gap: 10px; padding: 8px 15px; border-radius: 10px; }
         .user-dropdown span { font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
         .dashboard-content { padding: 30px; }
@@ -89,14 +92,12 @@
                 <i class="fas fa-user-shield"></i>
             </div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
-            <small>Administrator</small>
+            <small><%= StudentManagementSystem.DbHelper.GetRoleIdentity(Session) %></small>
         </div>
             <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link active"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -115,6 +116,9 @@
             <div class="topbar">
                 <h2><i class="fas fa-book me-2 text-primary"></i>Manage Programmes</h2>
                 <div class="topbar-actions">
+                    <div class="notification-bell" onclick="location.href='Announcements.aspx'" title="View notifications">
+                        <i class="fas fa-bell text-muted"></i>
+                    </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>

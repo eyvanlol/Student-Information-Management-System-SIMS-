@@ -12,7 +12,7 @@
         :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #3498db; --accent: #e74c3c; --success: #27ae60; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -23,13 +23,16 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--secondary); }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .topbar h2 { font-size: 1.4rem; color: #2c3e50; margin: 0; }
         .topbar-actions { display: flex; align-items: center; gap: 15px; }
+        .notification-bell { position: relative; width: 40px; height: 40px; border-radius: 50%; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .notification-bell:hover { background: #e9ecef; }
         .user-dropdown { display: flex; align-items: center; gap: 10px; padding: 8px 15px; border-radius: 10px; }
         .user-dropdown span { font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
 
@@ -65,18 +68,16 @@
     <form id="form1" runat="server">
         <div class="sidebar">
             <div class="sidebar-header">
-                <div style="width:70px;height:70px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;">
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
-                <small>Administrator</small>
+                <small><%= StudentManagementSystem.DbHelper.GetRoleIdentity(Session) %></small>
             </div>
             <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link active"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -94,6 +95,9 @@
             <div class="topbar">
                 <h2><i class="fas fa-users-cog me-2" style="color:#3498db;"></i>Manage Users</h2>
                 <div class="topbar-actions">
+                    <div class="notification-bell" onclick="location.href='Announcements.aspx'" title="View notifications">
+                        <i class="fas fa-bell text-muted"></i>
+                    </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -249,11 +253,6 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Actions" ItemStyle-Width="190px">
                                         <ItemTemplate>
-                                            <asp:LinkButton runat="server" CssClass="btn btn-sm btn-outline-secondary"
-                                                CommandName="ChangeRole" CommandArgument='<%# Eval("role") + "|" + Eval("id") %>'
-                                                OnClientClick='<%# "return confirm(\"Change this user to " + (Eval("role").ToString() == "Student" ? "Lecturer" : "Student") + "? A new login ID and email will be generated.\");" %>'>
-                                                <i class="fas fa-exchange-alt"></i> Role
-                                            </asp:LinkButton>
                                             <asp:LinkButton runat="server" CssClass="btn btn-sm btn-outline-danger"
                                                 CommandName="DeleteUser" CommandArgument='<%# Eval("role") + "|" + Eval("id") %>'
                                                 OnClientClick="return confirm('Delete this user?');">

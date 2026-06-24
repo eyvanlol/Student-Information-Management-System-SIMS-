@@ -412,3 +412,45 @@ ALTER TABLE NOTIFICATION DROP CONSTRAINT chk_notif_role;
 ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_role 
 CHECK (recipientRole IN ('student','lecturer','admin','all'));
 
+
+
+-- =====================================================================
+-- PATCH 12: ENROLMENT — numeric auto-ID fix (replaces string-MAX generator)
+-- enrolmentID is VARCHAR with no IDENTITY/DEFAULT; the old generator used
+-- MAX(enrolmentID)+1, but VARCHAR MAX sorts as text so MAX of "1".."10"
+-- is "9", producing 10 again -> PK violation on assign. This installs an
+-- INSTEAD OF INSERT trigger that generates the next ID NUMERICALLY and
+-- handles multi-row inserts. Safe to run multiple times.
+-- =====================================================================
+
+-- Drop ANY existing trigger on ENROLMENT (name-agnostic) so the old
+-- string-MAX trigger cannot fight the corrected one.
+DECLARE @drop NVARCHAR(MAX) = N'';
+SELECT @drop += N'DROP TRIGGER ' + QUOTENAME(s.name) + N'.' + QUOTENAME(t.name) + N';' + CHAR(10)
+FROM   sys.triggers t
+JOIN   sys.tables   tb ON t.parent_id  = tb.object_id
+JOIN   sys.schemas  s  ON tb.schema_id = s.schema_id
+WHERE  t.parent_id = OBJECT_ID('dbo.ENROLMENT');
+IF @drop <> N'' EXEC sp_executesql @drop;
+GO
+
+CREATE TRIGGER dbo.TR_ENROLMENT_AutoID
+ON dbo.ENROLMENT
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @base INT = (SELECT ISNULL(MAX(TRY_CAST(enrolmentID AS INT)), 0) FROM dbo.ENROLMENT);
+    INSERT INTO dbo.ENROLMENT
+        (enrolmentID, studentID, courseID, semester, academicYear, enrolDate, status)
+    SELECT
+        CAST(@base + ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS VARCHAR(20)),
+        i.studentID, i.courseID, i.semester, i.academicYear,
+        ISNULL(i.enrolDate, GETDATE()),
+        ISNULL(i.status, 'pending')
+    FROM inserted i;
+END
+GO
+
+PRINT 'PATCH 12 applied: dbo.TR_ENROLMENT_AutoID generates numeric enrolmentIDs.';
+GO

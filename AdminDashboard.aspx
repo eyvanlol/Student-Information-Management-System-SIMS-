@@ -14,9 +14,9 @@
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header {
             padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -34,8 +34,9 @@
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
+            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -163,8 +164,6 @@
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -185,7 +184,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-home me-2 text-primary"></i>Admin Dashboard</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell">
+                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
                         <i class="fas fa-bell text-muted"></i>
                         <span class="badge">5</span>
                     </div>
@@ -204,9 +203,9 @@
                 <div class="content-card" style="margin-bottom:25px;">
                     <div class="card-body" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
                         <i class="fas fa-user-shield" style="color:#3498db;font-size:1.2rem;"></i>
-                        <label class="form-label" style="margin:0;">Programme you head:</label>
+                        <label class="form-label" style="margin:0;">Programme:</label>
                         <asp:TextBox ID="txtHeadOf" runat="server" CssClass="form-control" style="max-width:280px;" placeholder="e.g. Computer Science" />
-                        <asp:Button ID="btnSaveHeadOf" runat="server" Text="Save" CssClass="btn btn-save" CausesValidation="false" OnClick="btnSaveHeadOf_Click" />
+                        <asp:Button ID="btnSaveHeadOf" runat="server" Text="Save" CssClass="btn btn-primary" CausesValidation="false" OnClick="btnSaveHeadOf_Click" />
                         <asp:Label ID="lblHeadOfMsg" runat="server" CssClass="small" />
                     </div>
                 </div>
@@ -219,7 +218,6 @@
                             <div class="stat-info">
                                 <h3><asp:Label ID="lblStudents" runat="server" Text="0"></asp:Label></h3>
                                 <p>Total Students</p>
-                                <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+12% from last year</div>
                             </div>
                         </div>
                     </div>
@@ -229,7 +227,6 @@
                             <div class="stat-info">
                                 <h3><asp:Label ID="lblLecturers" runat="server" Text="0"></asp:Label></h3>
                                 <p>Total Lecturers</p>
-                                <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+3 new this month</div>
                             </div>
                         </div>
                     </div>
@@ -239,7 +236,6 @@
                             <div class="stat-info">
                                 <h3><asp:Label ID="lblCourses" runat="server" Text="0"></asp:Label></h3>
                                 <p>Active Courses</p>
-                                <div class="stat-trend up"><i class="fas fa-arrow-up me-1"></i>+5 this semester</div>
                             </div>
                         </div>
                     </div>
@@ -249,7 +245,6 @@
                             <div class="stat-info">
                                 <h3><asp:Label ID="lblProgCount" runat="server" Text="0"></asp:Label></h3>
                                 <p>Programmes</p>
-                                <div class="stat-trend down"><i class="fas fa-arrow-down me-1"></i>-1 discontinued</div>
                             </div>
                         </div>
                     </div>
@@ -304,14 +299,6 @@
                                 <a href="ManageProgrammes.aspx" class="quick-action">
                                     <i class="fas fa-plus" style="background:#d4edda;color:#155724;"></i>
                                     <div><h6>Add New Programme</h6><small>Create a new academic programme</small></div>
-                                </a>
-                                <a href="RegisterLecturer.aspx" class="quick-action">
-                                    <i class="fas fa-user-plus" style="background:#d1ecf1;color:#0c5460;"></i>
-                                    <div><h6>Register Lecturer</h6><small>Add new lecturer to system</small></div>
-                                </a>
-                                <a href="RegisterStudent.aspx" class="quick-action">
-                                    <i class="fas fa-user-graduate" style="background:#fff3cd;color:#856404;"></i>
-                                    <div><h6>Register Student</h6><small>Process new student admission</small></div>
                                 </a>
                                 <a href="ManageEnrolment.aspx" class="quick-action">
                                     <i class="fas fa-clipboard-check" style="background:#f8d7da;color:#721c24;"></i>

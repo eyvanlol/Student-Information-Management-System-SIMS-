@@ -11,7 +11,7 @@
     <style>
         :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #3498db; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; margin-top: 10px;}
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
@@ -19,7 +19,8 @@
         .nav-link { color: rgba(255,255,255,0.8); padding: 14px 25px; display: flex; align-items: center; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: #3498db; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .topbar h2 { font-size: 1.4rem; color: #2c3e50; margin: 0; }

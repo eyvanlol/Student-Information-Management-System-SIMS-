@@ -14,9 +14,9 @@
 
         /* Sidebar - EXACT MATCH to AdminDashboard */
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header {
             padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -34,8 +34,9 @@
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
+            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -91,19 +92,19 @@
         .badge-custom {
             padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
         }
-        .badge-purple { background: #e8d5f2; color: #6c3483; }
+        .badge-purple { background: #d6eaf8; color: #2471a3; }
 
         .form-label { font-weight: 600; font-size: 0.85rem; color: #2c3e50; }
         .req { color: #e74c3c; }
 
         .btn-save {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             border: none; border-radius: 10px; padding: 12px 30px;
             font-weight: 600; color: white;
         }
 
         .lecturer-icon {
-            width: 80px; height: 80px; background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2980b9);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             color: white; font-size: 2rem; margin: 0 auto 20px;
         }
@@ -130,8 +131,6 @@
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link active"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -150,9 +149,9 @@
         <div class="main-content">
             <!-- Topbar - EXACT SAME as AdminDashboard -->
             <div class="topbar">
-                <h2><i class="fas fa-user-tie me-2" style="color:#9b59b6;"></i>Register New Lecturer</h2>
+                <h2><i class="fas fa-user-tie me-2" style="color:#3498db;"></i>Register New Lecturer</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell">
+                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
                         <i class="fas fa-bell text-muted"></i>
                         <span class="badge">3</span>
                     </div>
@@ -199,7 +198,7 @@
                                             <asp:TemplateField HeaderText="Lecturer">
                                                 <ItemTemplate>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <div style="width:32px;height:32px;background:linear-gradient(135deg,#9b59b6,#8e44ad);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;">
+                                                        <div style="width:32px;height:32px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;">
                                                             <i class="fas fa-chalkboard-teacher"></i>
                                                         </div>
                                                         <div>

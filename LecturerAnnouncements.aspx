@@ -12,7 +12,7 @@
         :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #9b59b6; --accent: #e74c3c; --success: #27ae60; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -23,7 +23,8 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--secondary); }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between;
@@ -91,7 +92,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-bullhorn me-2" style="color:#9b59b6;"></i>Announcements</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell"><i class="fas fa-bell text-muted"></i></div>
+                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='LecturerAnnouncements.aspx'" title="View notifications"><i class="fas fa-bell text-muted"></i></div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>

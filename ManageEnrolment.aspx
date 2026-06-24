@@ -5,7 +5,7 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manage Enrolment - Admin</title>
+    <title>Enrolment - Head of Programme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
     <style>
@@ -14,7 +14,7 @@
 
         /* ── SIDEBAR (same as AdminDashboard) ── */
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
             color: white; z-index: 1000; overflow-y: auto;
         }
@@ -31,7 +31,8 @@
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         /* ── MAIN ── */
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
@@ -132,14 +133,12 @@
                 <i class="fas fa-user-shield"></i>
             </div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
-            <small>Administrator</small>
+            <small><%= StudentManagementSystem.DbHelper.GetRoleIdentity(Session) %></small>
         </div>
         <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link active"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -158,7 +157,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-clipboard-check me-2 text-primary"></i>Manage Enrolment</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell">
+                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
                         <i class="fas fa-bell text-muted"></i>
                         <span class="badge">5</span>
                     </div>
@@ -199,7 +198,6 @@
                 <div class="content-card">
                     <div class="card-header-custom">
                         <h5><i class="fas fa-toggle-on me-2 text-primary"></i>Semester Sessions</h5>
-                        <small class="text-muted">Open or close enrolment windows. Closing auto-confirms all pending enrolments.</small>
                     </div>
                     <div class="card-body-custom">
                         <asp:Repeater ID="rptSemesters" runat="server">
@@ -241,7 +239,6 @@
                 <div class="content-card">
                     <div class="card-header-custom">
                         <h5><i class="fas fa-tasks me-2 text-success"></i>Assign Courses to Programme</h5>
-                        <small class="text-muted">Creates pending enrolment records for all students in the selected programme.</small>
                     </div>
                     <div class="card-body-custom">
                         <div class="row g-3 mb-4">
@@ -289,7 +286,6 @@
                 <div class="content-card">
                     <div class="card-header-custom">
                         <h5><i class="fas fa-minus-circle me-2 text-danger"></i>Pending Drop Requests</h5>
-                        <small class="text-muted">Approve or reject student course drop requests. Student is notified either way.</small>
                     </div>
                     <div class="card-body-custom p-0">
                         <asp:GridView

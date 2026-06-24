@@ -32,8 +32,9 @@ namespace StudentManagementSystem
                     "SELECT headOf FROM HOP_ADMIN WHERE adminID = @id",
                     new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
                 string h = (o == null || o == DBNull.Value) ? "" : o.ToString();
-                if (!string.IsNullOrEmpty(h))
-                    lblRoleIdentity.Text = "Head of Programme, " + h;
+                string identity = string.IsNullOrEmpty(h) ? "Head of Programme" : "Head of Programme, " + h;
+                lblRoleIdentity.Text = identity;
+                Session["RoleIdentity"] = identity;     // share with every other admin page
                 if (!IsPostBack)
                     txtHeadOf.Text = h;
             }
@@ -54,6 +55,7 @@ namespace StudentManagementSystem
                     new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
 
                 lblRoleIdentity.Text = string.IsNullOrEmpty(h) ? "Head of Programme" : "Head of Programme, " + h;
+                Session["RoleIdentity"] = lblRoleIdentity.Text;   // push update to other pages
                 lblHeadOfMsg.Text = "<span class='text-success'><i class='fas fa-check-circle me-1'></i>Saved.</span>";
             }
             catch (Exception ex)

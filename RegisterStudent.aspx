@@ -13,9 +13,9 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -28,7 +28,8 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: #3498db; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar {
@@ -63,8 +64,8 @@
 
         .form-label { font-weight: 600; font-size: 0.85rem; color: #2c3e50; }
         .req { color: #e74c3c; }
-        .btn-save { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); border: none; border-radius: 10px; padding: 12px 30px; font-weight: 600; color: white; }
-        .student-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #1abc9c, #16a085); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin: 0 auto 20px; }
+        .btn-save { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border: none; border-radius: 10px; padding: 12px 30px; font-weight: 600; color: white; }
+        .student-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2980b9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin: 0 auto 20px; }
         .gen-note { background: #eafaf1; border: 1px solid #abebc6; border-radius: 10px; padding: 12px 14px; font-size: 0.8rem; color: #117a65; }
 
         @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
@@ -86,8 +87,6 @@
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link active"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -105,9 +104,9 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="topbar">
-                <h2><i class="fas fa-user-graduate me-2" style="color:#1abc9c;"></i>Register New Student</h2>
+                <h2><i class="fas fa-user-graduate me-2" style="color:#3498db;"></i>Register New Student</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell"><i class="fas fa-bell text-muted"></i><span class="badge">4</span></div>
+                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications"><i class="fas fa-bell text-muted"></i><span class="badge">4</span></div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -149,7 +148,7 @@
                                             <asp:TemplateField HeaderText="Student">
                                                 <ItemTemplate>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;">
+                                                        <div style="width:32px;height:32px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;">
                                                             <i class="fas fa-user-graduate"></i>
                                                         </div>
                                                         <div>
