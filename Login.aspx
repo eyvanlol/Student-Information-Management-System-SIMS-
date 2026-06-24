@@ -114,20 +114,14 @@
 
                     <div id="alertBox" class="alert-box" runat="server"></div>
 
-                    <div class="position-relative">
+                    <div class="position-relative mb-3">
                         <i class="fas fa-envelope input-icon"></i>
-                        <div class="form-floating">
-                            <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="Email Address"></asp:TextBox>
-                            <label for="txtEmail">Email Address</label>
-                        </div>
+                        <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="Email Address" style="padding-left: 45px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.2); color: #2c3e50; height: 56px;"></asp:TextBox>
                     </div>
 
-                    <div class="position-relative">
+                    <div class="position-relative mb-3">
                         <i class="fas fa-lock input-icon"></i>
-                        <div class="form-floating">
-                            <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" placeholder="Password" TextMode="Password"></asp:TextBox>
-                            <label for="txtPassword">Password</label>
-                        </div>
+                        <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" placeholder="Password" TextMode="Password" style="padding-left: 45px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.2); color: #2c3e50; height: 56px;"></asp:TextBox>
                     </div>
 
 
