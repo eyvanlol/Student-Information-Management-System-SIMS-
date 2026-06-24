@@ -15,7 +15,7 @@
         /* ── SIDEBAR ── */
         .sidebar {
             width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
+            background: linear-gradient(180deg, #114f46 0%, #0c2e2a 100%);
             color: white; z-index: 1000; overflow-y: auto;
         }
         .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -114,7 +114,7 @@
     <!-- ── SIDEBAR ── -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div style="width:50px;height:50px;background:rgba(255,255,255,0.2);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;">
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;">
                 <i class="fas fa-user-graduate"></i>
             </div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Student"></asp:Label></h4>
@@ -127,6 +127,7 @@
                 <div class="nav-item"><a href="StudentResult.aspx" class="nav-link"><i class="fas fa-chart-line"></i><span>Results</span></a></div>
                 <div class="nav-item"><a href="StudentTranscript.aspx" class="nav-link"><i class="fas fa-file-alt"></i><span>Transcript</span></a></div>
                 <div class="nav-item"><a href="StudentNotifications.aspx" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
+                <div class="nav-item"><a href="StudentProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>Profile</span></a></div>
             </nav>
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -148,7 +149,10 @@
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
                         </div>
-                        <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
+                        <div style="display:flex;flex-direction:column;line-height:1.2;">
+                            <span style="font-size:0.9rem;font-weight:600;color:#2c3e50;"><asp:Label ID="lblTopUserName" runat="server" Text=""></asp:Label></span>
+                            <span style="font-size:0.72rem;color:#7f8c8d;"><asp:Label ID="lblTopStudentId" runat="server" Text=""></asp:Label></span>
+                        </div>
                     </div>
             </div>
         </div>
@@ -166,7 +170,6 @@
                         <div class="banner-title">Enrolment window is OPEN</div>
                         <div class="banner-sub">
                             <asp:Label ID="lblWindowDetails" runat="server"></asp:Label>
-                            &mdash; You can confirm your courses or submit drop requests.
                         </div>
                     </div>
                 </div>

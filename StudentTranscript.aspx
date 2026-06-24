@@ -16,7 +16,7 @@
 
         .sidebar {
             width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
+            background: linear-gradient(180deg, #114f46 0%, #0c2e2a 100%);
             color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
         }
 
@@ -25,9 +25,9 @@
         }
 
         .sidebar-header .logo {
-            width: 70px; height: 70px; background: linear-gradient(135deg, #1abc9c, #16a085);
+            width: 60px; height: 60px; background: linear-gradient(135deg, #1abc9c, #16a085);
             border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: white;
+            font-size: 1.3rem; color: white;
         }
 
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -144,6 +144,7 @@
                 <div class="nav-item"><a href="StudentResult.aspx" class="nav-link"><i class="fas fa-chart-line"></i><span>Results</span></a></div>
                 <div class="nav-item"><a href="StudentTranscript.aspx" class="nav-link active"><i class="fas fa-file-alt"></i><span>Transcript</span></a></div>
                 <div class="nav-item"><a href="StudentNotifications.aspx" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
+                <div class="nav-item"><a href="StudentProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>Profile</span></a></div>
             </nav>
 
         <div class="sidebar-footer">

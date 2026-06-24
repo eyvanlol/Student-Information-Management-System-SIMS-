@@ -24,6 +24,23 @@ namespace StudentManagementSystem
                 lblTopUserName.Text = Session["UserName"].ToString();
             }
 
+            // Student ID shown under the name in the top bar
+            if (Session["UserID"] != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = DbHelper.GetConnection())
+                    using (SqlCommand cmd = new SqlCommand("SELECT studentCode FROM STUDENT WHERE studentID = @sid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", Convert.ToInt32(Session["UserID"]));
+                        conn.Open();
+                        object code = cmd.ExecuteScalar();
+                        lblTopStudentId.Text = code != null ? code.ToString() : "";
+                    }
+                }
+                catch { lblTopStudentId.Text = ""; }
+            }
+
             // Handle drop button postback (plain HTML submit button)
             if (IsPostBack && Request.Form["dropBtn"] != null)
             {

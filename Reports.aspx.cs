@@ -141,6 +141,30 @@ namespace StudentManagementSystem
             Response.End();
         }
 
+        // --- EXPORT TO EXCEL ---
+        protected void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            DataTable dt = GetReportData();
+            LogExportAction("Excel Export");
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt, "SystemReport");
+                Response.Clear();
+                Response.Buffer = true;
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.AddHeader("content-disposition", $"attachment;filename={ddlReportType.SelectedValue}_Report.xlsx");
+
+                using (MemoryStream MyMemoryStream = new MemoryStream())
+                {
+                    wb.SaveAs(MyMemoryStream);
+                    MyMemoryStream.WriteTo(Response.OutputStream);
+                    Response.Flush();
+                    Response.End();
+                }
+            }
+        }
+
         // --- EXPORT TO PDF ---
         protected void btnExportPDF_Click(object sender, EventArgs e)
         {
@@ -280,7 +304,7 @@ namespace StudentManagementSystem
         }
 
         protected void btnLogout_Click(object sender, EventArgs e)
-        { 
+        {
             Session.Clear();
             Session.Abandon();
             Response.Redirect("Login.aspx");

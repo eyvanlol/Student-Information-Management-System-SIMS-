@@ -13,7 +13,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
+            background: linear-gradient(180deg, #114f46 0%, #0c2e2a 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
@@ -65,7 +65,7 @@
     <form id="form1" runat="server">
         <div class="sidebar">
             <div class="sidebar-header">
-                <div style="width:70px;height:70px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;">
                     <i class="fas fa-user-graduate"></i>
                 </div>
                 <h4><asp:Label ID="lblUserName" runat="server" Text="Student"></asp:Label></h4>
@@ -78,6 +78,7 @@
                 <div class="nav-item"><a href="StudentResult.aspx" class="nav-link"><i class="fas fa-chart-line"></i><span>Results</span></a></div>
                 <div class="nav-item"><a href="StudentTranscript.aspx" class="nav-link"><i class="fas fa-file-alt"></i><span>Transcript</span></a></div>
                 <div class="nav-item"><a href="StudentNotifications.aspx" class="nav-link active"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
+                <div class="nav-item"><a href="StudentProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>Profile</span></a></div>
             </nav>
             <div class="sidebar-footer">
                 <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
