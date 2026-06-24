@@ -294,7 +294,7 @@
 
             <div class="topbar-actions">
 
-                <div class="notification-bell">
+                <div class="notification-bell" style="cursor:pointer;" onclick="location.href='StudentNotifications.aspx'" title="View notifications">
                     <i class="fas fa-bell text-muted"></i>
                     <span class="badge">4</span>
                 </div>

@@ -15,7 +15,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
             color: white; z-index: 1000; overflow-y: auto;
         }
@@ -36,8 +36,9 @@
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
 
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
+            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -94,7 +95,8 @@
 
         .card-body-custom { padding: 25px; }
 
-        canvas { max-height: 320px; }
+        .chart-wrap { position: relative; height: 320px; }
+        .chart-wrap canvas { position: absolute; inset: 0; }
 
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -112,15 +114,13 @@
                 <i class="fas fa-user-shield"></i>
             </div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
-            <small>Administrator</small>
+            <small><%= StudentManagementSystem.DbHelper.GetRoleIdentity(Session) %></small>
         </div>
 
         <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
                 <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
                 <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
-                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
-                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
                 <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link active"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
@@ -143,7 +143,7 @@
             </h2>
 
             <div class="topbar-actions">
-                <div class="notification-bell">
+                <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
                     <i class="fas fa-bell text-muted"></i>
                     <span class="badge">5</span>
                 </div>
@@ -170,7 +170,7 @@
                         </div>
 
                         <div class="card-body-custom">
-                            <canvas id="gpaChart"></canvas>
+                            <div class="chart-wrap"><canvas id="gpaChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                         </div>
 
                         <div class="card-body-custom">
-                            <canvas id="attendanceChart"></canvas>
+                            <div class="chart-wrap"><canvas id="attendanceChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -216,6 +216,11 @@
                 label: 'Number of Students',
                 data: gpaData
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false
         }
     });
 
@@ -230,6 +235,11 @@
                 label: 'Attendance %',
                 data: attData
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false
         }
     });
 </script>

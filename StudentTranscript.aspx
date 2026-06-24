@@ -15,9 +15,9 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #114f46 0%, #0c2e2a 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
 
         .sidebar-header {
@@ -47,8 +47,9 @@
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
 
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
+            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -159,7 +160,7 @@
             <h2><i class="fas fa-file-alt me-2" style="color:#1abc9c;"></i>Attendance & Transcript</h2>
 
             <div class="topbar-actions">
-                <div class="notification-bell">
+                <div class="notification-bell" style="cursor:pointer;" onclick="location.href='StudentNotifications.aspx'" title="View notifications">
                     <i class="fas fa-bell text-muted"></i>
                     <span class="badge">4</span>
                 </div>
