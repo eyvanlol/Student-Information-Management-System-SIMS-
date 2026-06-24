@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Reports.aspx.cs" Inherits="StudentManagementSystem.Reports" %>
+﻿﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Reports.aspx.cs" Inherits="StudentManagementSystem.Reports" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,15 +11,18 @@
     <style>
         :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #3498db; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; overflow-y: auto; }
-        .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; margin-top: 10px;}
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto; }
+        .sidebar-header { padding: 15px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 10px; border: 3px solid rgba(255,255,255,0.3); }
+        .sidebar-header h4 { font-size:0.75; margin-bottom: 3px; }
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
         .nav-item { padding: 0; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 14px 25px; display: flex; align-items: center; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 8px 5px; display: flex; align-items: center; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left-color: #3498db; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .nav-link span { font-size: 0.9rem; }
+        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); background: #34495e; }
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .topbar h2 { font-size: 1.4rem; color: #2c3e50; margin: 0; }
@@ -46,8 +49,16 @@
             </div>
             <nav class="mt-3">
                 <div class="nav-item"><a href="AdminDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="ManageProgrammes.aspx" class="nav-link"><i class="fas fa-book"></i><span>Academic Programmes</span></a></div>
+                <div class="nav-item"><a href="ManageCourses.aspx" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Courses</span></a></div>
+                <div class="nav-item"><a href="RegisterLecturer.aspx" class="nav-link"><i class="fas fa-user-tie"></i><span>Register Lecturer</span></a></div>
+                <div class="nav-item"><a href="RegisterStudent.aspx" class="nav-link"><i class="fas fa-user-graduate"></i><span>Register Student</span></a></div>
+                <div class="nav-item"><a href="ManageUsers.aspx" class="nav-link"><i class="fas fa-users"></i><span>Manage Users</span></a></div>
+                <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
+                <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
                 <div class="nav-item"><a href="Reports.aspx" class="nav-link active"><i class="fas fa-file-export"></i><span>Reports</span></a></div>
-                <div class="nav-item"><a href="AtRiskStudents.aspx" class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>At-Risk Students</span></a></div>
+                <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
+                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
             <div class="sidebar-footer">
                 <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -126,7 +137,6 @@
                     <div class="card-header"><h5><i class="fas fa-table me-2 text-primary"></i>Report Preview & Export</h5></div>
                     <div class="bg-light p-3 border-bottom d-flex justify-content-end gap-2">
                         <asp:Button ID="btnExportCSV" runat="server" Text="Export to CSV" CssClass="btn btn-outline-secondary fw-bold shadow-sm" OnClick="btnExportCSV_Click" />
-                        <asp:Button ID="btnExportExcel" runat="server" Text="Export to Excel" CssClass="btn btn-success fw-bold shadow-sm" OnClick="btnExportExcel_Click" />
                         <asp:Button ID="btnExportPDF" runat="server" Text="Export to PDF" CssClass="btn btn-danger fw-bold shadow-sm" OnClick="btnExportPDF_Click" />
                     </div>
                     <div class="table-responsive p-3">
