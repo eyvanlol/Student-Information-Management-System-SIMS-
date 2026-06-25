@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Web.Security;
@@ -25,7 +26,32 @@ namespace StudentManagementSystem
             {
                 txtDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
                 LoadCourses();
+
+                // Load sidebar avatar directly
+                int lecturerID = Convert.ToInt32(Session["UserID"]);
+                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(lecturerID);
             }
+        }
+
+        // Profile picture logic directly in this page
+        private string GetProfilePictureUrl(int lecturerID)
+        {
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+            string imageUrl = "~/Uploads/ProfilePictures/default.png";
+
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
+                if (File.Exists(filePath))
+                {
+                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
+                    break;
+                }
+            }
+
+            return imageUrl;
         }
 
         private void LoadCourses()
@@ -103,7 +129,6 @@ namespace StudentManagementSystem
                 return;
             }
 
-            // DUPLICATE CHECK: Prevent re-recording attendance for same course/date/session
             int lecturerID = Convert.ToInt32(Session["UserID"]);
             int courseID = Convert.ToInt32(ddlCourse.SelectedValue);
             DateTime attendanceDate = Convert.ToDateTime(txtDate.Text);
@@ -128,7 +153,6 @@ namespace StudentManagementSystem
                 return;
             }
 
-            // END DUPLICATE CHECK
             using (SqlConnection con = new SqlConnection(cs))
             {
                 con.Open();
@@ -209,66 +233,35 @@ namespace StudentManagementSystem
             if (percent < 80)
             {
                 InsertNotification(studentID, courseName, percent, con);
-
-                // Turn this on later when Gmail SMTP is ready
-                // SendWarningEmail(studentEmail, courseName, percent);
             }
         }
 
         private void InsertNotification(int studentID, string courseName, int percent, SqlConnection con)
         {
             string sql = @"
-                INSERT INTO NOTIFICATION
-                (recipientID, recipientRole, title, message, isRead, notifType)
-                VALUES
-                (@studentID, 'student', @title, @message, 0, 'attendance')";
+                INSERT INTO NOTIFICATION (recipientID, recipientRole, title, message, notifType)
+                VALUES (@rID, 'student', @title, @msg, 'attendance')";
 
             using (SqlCommand cmd = new SqlCommand(sql, con))
             {
-                cmd.Parameters.AddWithValue("@studentID", studentID);
-                cmd.Parameters.AddWithValue("@title", "Attendance warning - " + courseName);
-                cmd.Parameters.AddWithValue("@message",
-                    "Your attendance for " + courseName +
-                    " is below 80%. Current attendance: " + percent + "%.");
-
+                cmd.Parameters.AddWithValue("@rID", studentID);
+                cmd.Parameters.AddWithValue("@title", "Attendance Warning - " + courseName);
+                cmd.Parameters.AddWithValue("@msg", "Your attendance for " + courseName + " has dropped to " + percent + "%. Please attend classes regularly.");
                 cmd.ExecuteNonQuery();
             }
         }
 
-        private void SendWarningEmail(string toEmail, string courseName, int percent)
+        private void ShowMessage(string message, bool isSuccess)
         {
-            if (string.IsNullOrEmpty(toEmail)) return;
-
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress("YOUR_GMAIL@gmail.com");
-            mail.To.Add(toEmail);
-            mail.Subject = "Attendance Warning - " + courseName;
-            mail.Body =
-                "Dear Student,\n\n" +
-                "Your attendance for " + courseName + " is below the required 80% threshold.\n" +
-                "Current attendance: " + percent + "%\n\n" +
-                "Please attend future classes to improve your attendance.\n\n" +
-                "SIMS";
-
-            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-            smtp.Credentials = new NetworkCredential("YOUR_GMAIL@gmail.com", "YOUR_APP_PASSWORD");
-            smtp.EnableSsl = true;
-            smtp.Send(mail);
+            lblMsg.Text = message;
+            lblMsg.CssClass = isSuccess ? "alert alert-success" : "alert alert-danger";
         }
 
         protected void btnLogout_Click(object sender, EventArgs e)
         {
             Session.Clear();
             Session.Abandon();
-            FormsAuthentication.SignOut();
             Response.Redirect("Login.aspx");
-        }
-
-        private void ShowMessage(string msg, bool success)
-        {
-            lblMsg.Text = "<div class='alert " +
-                          (success ? "alert-success" : "alert-danger") +
-                          "'>" + msg + "</div>";
         }
     }
 }

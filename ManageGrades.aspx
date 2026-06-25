@@ -11,11 +11,19 @@
     <style>
         :root { --sidebar-width: 260px; --primary: #2c3e50; --secondary: #9b59b6; --accent: #e74c3c; --success: #27ae60; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
-        
+
         /* MATCHING PURPLE SIDEBAR */
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: white; z-index: 1000; overflow-y: auto; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header .logo { width: 70px; height: 70px; background: linear-gradient(135deg, #9b59b6, #8e44ad); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        .sidebar-avatar {
+            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 10px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        .sidebar-avatar img {
+            width: 70px; height: 70px; object-fit: cover; border-radius: 50%;
+            display: block;
+        }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
         .nav-item { padding: 0; }
@@ -23,8 +31,7 @@
         .nav-link:hover, .nav-link.active { background: rgba(155, 89, 182, 0.15); color: white; border-left-color: #9b59b6; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
-        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -44,7 +51,7 @@
         .table-custom th { background: #f8f9fa; padding: 15px; font-size: 0.8rem; font-weight: 700; color: #7f8c8d; text-transform: uppercase; border: none; letter-spacing: 0.5px; }
         .table-custom td { padding: 15px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; font-size: 0.9rem; color: #2c3e50; }
         .table-custom tr:hover td { background: #f8f9fa; }
-        
+
         /* Inputs */
         .mark-input { width: 80px; text-align: center; border: 1px solid #ced4da; border-radius: 6px; padding: 5px; }
         .mark-input:focus { border-color: #9b59b6; outline: none; box-shadow: 0 0 0 0.2rem rgba(155,89,182,.25); }
@@ -59,16 +66,23 @@
     <form id="form1" runat="server">
         <div class="sidebar">
             <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="sidebar-avatar">
+                    <asp:Image ID="imgSidebarAvatar" runat="server" 
+                        Width="70" Height="70"
+                        ImageUrl="~/Uploads/ProfilePictures/default.png" 
+                        AlternateText="Avatar" />
+                </div>
                 <h4><asp:Label ID="lblUserName" runat="server"></asp:Label></h4>
                 <small>Senior Lecturer</small>
             </div>
             <nav class="mt-3">
-                <div class="nav-item"><a href="LecturerDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-                <div class="nav-item"><a href="LecturerProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
-                <div class="nav-item"><a href="LecturerCourses.aspx" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
-                <div class="nav-item"><a href="LecturerAttendance.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-                <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link active"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
+                <div class="nav-item"><a href="LecturerDashboard.aspx"    class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                <div class="nav-item"><a href="LecturerProfile.aspx"      class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
+                <div class="nav-item"><a href="LecturerCourses.aspx"      class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
+                <div class="nav-item"><a href="LecturerAttendance.aspx"   class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
+                <div class="nav-item"><a href="ManageGrades.aspx"         class="nav-link active"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
+                <div class="nav-item"><a href="AtRiskStudents.aspx"       class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>At Risk Students</span></a></div>
+                <div class="nav-item"><a href="LecturerStudentProgress.aspx"       class="nav-link"><i class="fas fa-chart-bar"></i><span>Student Progress</span></a></div>
                 <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
             </nav>
         </div>
@@ -76,9 +90,9 @@
         <div class="main-content">
             <div class="topbar">
                 <h2><i class="fas fa-edit me-2" style="color:#9b59b6;"></i>Grades & Assessments</h2>
-                
+
                 <div class="topbar-actions">
-                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='LecturerAnnouncements.aspx'" title="View notifications"><i class="fas fa-bell text-muted"></i><span class="badge">3</span></div>
+                    <div class="notification-bell"><i class="fas fa-bell text-muted"></i><span class="badge">3</span></div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -90,7 +104,7 @@
 
             <div class="dashboard-content">
                 <div class="content-card">
-                    
+
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 2px solid #f0f0f0;">
                         <div>
                             <h4 class="mb-1" style="color:#2c3e50; font-weight:700;">
@@ -100,7 +114,7 @@
                             </h4>
                             <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Select a course to manage student assessments.</small>
                         </div>
-                        
+
                         <asp:Label ID="lblStatus" runat="server" Visible="false" CssClass="badge bg-success p-2 fs-6"></asp:Label>
                     </div>
 

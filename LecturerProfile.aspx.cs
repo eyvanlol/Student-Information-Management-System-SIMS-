@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Web.UI;
 
 namespace StudentManagementSystem
@@ -21,6 +22,8 @@ namespace StudentManagementSystem
                 lblUserName.Text = Session["UserName"].ToString();
                 lblTopUserName.Text = Session["UserName"].ToString();
                 LoadProfile();
+                LoadProfilePicture();
+                LoadSidebarAvatar();
             }
         }
 
@@ -100,6 +103,149 @@ namespace StudentManagementSystem
             Session.Clear();
             Session.Abandon();
             Response.Redirect("Login.aspx");
+        }
+
+        // ============================================================
+        // PROFILE PICTURE METHODS - NO DATABASE REQUIRED
+        // ============================================================
+
+        /// <summary>
+        /// Gets the profile picture URL for the current lecturer
+        /// </summary>
+        private string GetProfilePictureUrl()
+        {
+            int lecturerID = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+            string imageUrl = "~/Uploads/ProfilePictures/default.png";
+
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
+                if (File.Exists(filePath))
+                {
+                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
+                    break;
+                }
+            }
+
+            return imageUrl;
+        }
+
+        /// <summary>
+        /// Loads the main profile picture
+        /// </summary>
+        private void LoadProfilePicture()
+        {
+            imgProfilePic.ImageUrl = GetProfilePictureUrl();
+        }
+
+        /// <summary>
+        /// Loads the sidebar avatar (same as profile picture)
+        /// </summary>
+        private void LoadSidebarAvatar()
+        {
+            imgSidebarAvatar.ImageUrl = GetProfilePictureUrl();
+        }
+
+        /// <summary>
+        /// Upload a new profile picture
+        /// </summary>
+        protected void btnUpload_Click(object sender, EventArgs e)
+        {
+            lblUploadMsg.Text = "";
+            lblUploadMsg.CssClass = "text-danger d-block mt-2";
+
+            if (!fuProfilePic.HasFile)
+            {
+                lblUploadMsg.Text = "Please select an image file.";
+                return;
+            }
+
+            // Validate extension manually (no System.Linq)
+            string ext = Path.GetExtension(fuProfilePic.FileName).ToLower();
+            bool isValidExtension = false;
+
+            if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif")
+            {
+                isValidExtension = true;
+            }
+
+            if (!isValidExtension)
+            {
+                lblUploadMsg.Text = "Only JPG, PNG, or GIF files allowed.";
+                return;
+            }
+
+            // Validate size (max 2MB)
+            if (fuProfilePic.PostedFile.ContentLength > 2 * 1024 * 1024)
+            {
+                lblUploadMsg.Text = "File size must be less than 2MB.";
+                return;
+            }
+
+            int lecturerID = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+
+            // Create directory if missing
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
+
+            // Delete any existing pictures for this lecturer
+            DeleteExistingProfilePictures(lecturerID, uploadPath);
+
+            // Save new file
+            string fileName = "lecturer_" + lecturerID + ext;
+            string fullPath = Path.Combine(uploadPath, fileName);
+
+            try
+            {
+                fuProfilePic.SaveAs(fullPath);
+                lblUploadMsg.CssClass = "text-success d-block mt-2";
+                lblUploadMsg.Text = "Profile picture updated!";
+
+                // Refresh both profile pic and sidebar avatar
+                LoadProfilePicture();
+                LoadSidebarAvatar();
+            }
+            catch (Exception ex)
+            {
+                lblUploadMsg.Text = "Error: " + ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// Remove profile picture and revert to default
+        /// </summary>
+        protected void btnRemovePic_Click(object sender, EventArgs e)
+        {
+            int lecturerID = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+
+            DeleteExistingProfilePictures(lecturerID, uploadPath);
+
+            lblUploadMsg.CssClass = "text-success d-block mt-2";
+            lblUploadMsg.Text = "Profile picture removed.";
+
+            // Refresh both profile pic and sidebar avatar
+            LoadProfilePicture();
+            LoadSidebarAvatar();
+        }
+
+        /// <summary>
+        /// Helper: Delete all profile pictures for a lecturer
+        /// </summary>
+        private void DeleteExistingProfilePictures(int lecturerID, string uploadPath)
+        {
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
         }
     }
 }

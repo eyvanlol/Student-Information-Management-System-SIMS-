@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Data;
 using System.Data.SqlClient;
 using DocumentFormat.OpenXml.Drawing;
@@ -7,6 +8,25 @@ namespace StudentManagementSystem
 {
     public partial class LecturerDashboard : System.Web.UI.Page
     {
+        private string GetProfilePictureUrl(int lecturerID)
+        {
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+            string imageUrl = "~/Uploads/ProfilePictures/default.png";
+
+            foreach (string ext in extensions)
+            {
+                string filePath = System.IO.Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
+                if (System.IO.File.Exists(filePath))
+                {
+                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
+                    break;
+                }
+            }
+            return imageUrl;
+        }
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Lecturer")
@@ -30,6 +50,7 @@ namespace StudentManagementSystem
 
                 if (!IsPostBack)
                     LoadDashboard();
+                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(Convert.ToInt32(Session["UserID"]));
             }
         }
 

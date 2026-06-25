@@ -13,16 +13,22 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
             background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
+            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
         }
         .sidebar-header {
             padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .sidebar-header .logo {
-            width: 70px; height: 70px; background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
+        .sidebar-avatar {
+            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 10px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        .sidebar-avatar img {
+            width: 70px; height: 70px; object-fit: cover; border-radius: 50%;
+        }
+        .sidebar-avatar i {
             font-size: 1.5rem; color: white;
         }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
@@ -37,9 +43,8 @@
         }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
         .sidebar-footer {
-            margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px;
+            position: absolute; bottom: 0; width: 100%; padding: 15px 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -69,11 +74,49 @@
         .card-header h5 { margin: 0; font-weight: 700; color: #2c3e50; }
         .card-body { padding: 30px; }
 
-        .profile-avatar {
-            width: 120px; height: 120px; background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 3rem; margin: 0 auto 20px;
+        /* Profile Picture with Edit Overlay */
+        .profile-pic-wrapper {
+            position: relative;
+            width: 120px; height: 120px;
+            margin: 0 auto 20px;
         }
+        .profile-pic-wrapper img {
+            width: 120px; height: 120px;
+            object-fit: cover; border-radius: 50%;
+            display: block;
+            border: 3px solid #9b59b6;
+        }
+        .profile-pic-wrapper .default-avatar {
+            width: 120px; height: 120px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 3rem;
+            border: 3px solid #9b59b6;
+        }
+        /* Edit button overlay */
+        .edit-pic-btn {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 36px; height: 36px;
+            background: #9b59b6;
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .edit-pic-btn:hover {
+            background: #8e44ad;
+            transform: scale(1.1);
+        }
+        /* Hidden file input */
+        .hidden-file-input {
+            display: none;
+        }
+
         .form-group { margin-bottom: 20px; }
         .form-group label {
             font-size: 0.8rem; font-weight: 700; color: #7f8c8d; text-transform: uppercase;
@@ -97,6 +140,12 @@
         .btn-save:hover {
             transform: translateY(-2px); box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
         }
+        .btn-save.btn-sm {
+            padding: 8px 20px; font-size: 0.85rem;
+        }
+        .btn-outline-danger.btn-sm {
+            padding: 8px 20px; font-size: 0.85rem;
+        }
         .alert-box {
             padding: 12px 15px; border-radius: 10px; margin-bottom: 20px;
             font-size: 0.9rem;
@@ -114,21 +163,29 @@
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server" />
 
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-chalkboard-teacher"></i></div>
-                <h4><asp:Label ID="lblUserName" runat="server" Text="Lecturer"></asp:Label></h4>
-                <small>Senior Lecturer</small>
-            </div>
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <!-- Sidebar Avatar - Linked to Profile Picture -->
+                    <div class="sidebar-avatar">
+                        <asp:Image ID="imgSidebarAvatar" runat="server" 
+                            Width="70" Height="70"
+                            ImageUrl="~/Uploads/ProfilePictures/default.png" 
+                            AlternateText="Avatar" />
+                    </div>
+                    <h4><asp:Label ID="lblUserName" runat="server" Text="Lecturer"></asp:Label></h4>
+                    <small>Senior Lecturer</small>
+                </div>
 
-            <nav class="mt-3">
-                <div class="nav-item"><a href="LecturerDashboard.aspx" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
-                <div class="nav-item"><a href="LecturerProfile.aspx" class="nav-link active"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
-                <div class="nav-item"><a href="LecturerCourses.aspx" class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
-                <div class="nav-item"><a href="LecturerAttendance.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-                <div class="nav-item"><a href="ManageGrades.aspx" class="nav-link"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
-                <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-            </nav>
+                <nav class="mt-3">
+                    <div class="nav-item"><a href="LecturerDashboard.aspx"    class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></div>
+                    <div class="nav-item"><a href="LecturerProfile.aspx"      class="nav-link active"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
+                    <div class="nav-item"><a href="LecturerCourses.aspx"      class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
+                    <div class="nav-item"><a href="LecturerAttendance.aspx"   class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
+                    <div class="nav-item"><a href="ManageGrades.aspx"         class="nav-link"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
+                    <div class="nav-item"><a href="AtRiskStudents.aspx"       class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>At Risk Students</span></a></div>
+                    <div class="nav-item"><a href="LecturerStudentProgress.aspx"       class="nav-link"><i class="fas fa-chart-bar"></i><span>Student Progress</span></a></div>
+                    <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
+                </nav>
 
             <div class="sidebar-footer">
                 <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -162,11 +219,38 @@
                                 <div id="alertBox" runat="server" class="alert-box" style="display:none;"></div>
 
                                 <div class="text-center mb-4">
-                                    <div class="profile-avatar">
-                                        <i class="fas fa-user"></i>
+                                    <!-- Profile Picture with Pencil Edit Button -->
+                                    <div class="profile-pic-wrapper">
+                                        <asp:Image ID="imgProfilePic" runat="server" 
+                                            ImageUrl="~/Uploads/ProfilePictures/default.png" 
+                                            AlternateText="Profile Picture" />
+                                        
+                                        <!-- Pencil edit button triggers file upload -->
+                                        <label for="<%= fuProfilePic.ClientID %>" class="edit-pic-btn" title="Change profile picture">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </label>
                                     </div>
+                                    
                                     <h4 class="mb-1"><asp:Label ID="lblProfileName" runat="server"></asp:Label></h4>
                                     <span class="badge bg-secondary"><asp:Label ID="lblStaffType" runat="server"></asp:Label></span>
+                                    
+                                    <!-- Hidden File Upload + Buttons -->
+                                    <div class="mt-3" style="max-width: 300px; margin: 0 auto;">
+                                        <asp:FileUpload ID="fuProfilePic" runat="server" 
+                                            CssClass="hidden-file-input" 
+                                            accept=".jpg,.jpeg,.png,.gif" />
+                                        
+                                        <div class="mt-2">
+                                            <asp:Button ID="btnUpload" runat="server" Text="Upload" 
+                                                CssClass="btn btn-save btn-sm" 
+                                                OnClick="btnUpload_Click" />
+                                            <asp:Button ID="btnRemovePic" runat="server" Text="Remove" 
+                                                CssClass="btn btn-outline-danger btn-sm ms-2" 
+                                                OnClick="btnRemovePic_Click" 
+                                                OnClientClick="return confirm('Remove profile picture?');" />
+                                        </div>
+                                        <asp:Label ID="lblUploadMsg" runat="server" CssClass="d-block mt-2" style="font-size: 0.8rem;"></asp:Label>
+                                    </div>
                                 </div>
 
                                 <div class="row">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -10,7 +11,6 @@ namespace StudentManagementSystem
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Auth check
             if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Lecturer")
             {
                 Response.Redirect("Login.aspx");
@@ -21,8 +21,34 @@ namespace StudentManagementSystem
             {
                 lblUserName.Text = Session["UserName"].ToString();
                 lblTopUserName.Text = Session["UserName"].ToString();
+
+                // Load sidebar avatar directly
+                int lecturerID = Convert.ToInt32(Session["UserID"]);
+                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(lecturerID);
+
                 LoadCourses();
             }
+        }
+
+        // Profile picture logic directly in this page
+        private string GetProfilePictureUrl(int lecturerID)
+        {
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+            string imageUrl = "~/Uploads/ProfilePictures/default.png";
+
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
+                if (File.Exists(filePath))
+                {
+                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
+                    break;
+                }
+            }
+
+            return imageUrl;
         }
 
         private void LoadCourses(string searchTerm = "")

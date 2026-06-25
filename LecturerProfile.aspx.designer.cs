@@ -33,6 +33,15 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.ScriptManager ScriptManager1;
 
         /// <summary>
+        /// imgSidebarAvatar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgSidebarAvatar;
+
+        /// <summary>
         /// lblUserName control.
         /// </summary>
         /// <remarks>
@@ -78,6 +87,15 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertBox;
 
         /// <summary>
+        /// imgProfilePic control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgProfilePic;
+
+        /// <summary>
         /// lblProfileName control.
         /// </summary>
         /// <remarks>
@@ -94,6 +112,42 @@ namespace StudentManagementSystem
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblStaffType;
+
+        /// <summary>
+        /// fuProfilePic control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.FileUpload fuProfilePic;
+
+        /// <summary>
+        /// btnUpload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpload;
+
+        /// <summary>
+        /// btnRemovePic control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRemovePic;
+
+        /// <summary>
+        /// lblUploadMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblUploadMsg;
 
         /// <summary>
         /// txtLecturerID control.
