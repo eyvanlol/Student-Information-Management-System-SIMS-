@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminDashboard.aspx.cs" Inherits="StudentManagementSystem.AdminDashboard" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -157,7 +158,7 @@
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <h4><asp:Label ID="lblUserName" runat="server" Text="Head of Programme"></asp:Label></h4>
-                <small><asp:Label ID="lblRoleIdentity" runat="server" Text="Head of Programme"></asp:Label></small>
+                <small><asp:Label ID="lblRoleIdentity" runat="server" Text="Admin"></asp:Label></small>
             </div>
 
             <nav class="mt-3">
@@ -168,7 +169,6 @@
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
                 <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
 
             <div class="sidebar-footer">
@@ -184,10 +184,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-home me-2 text-primary"></i>Admin Dashboard</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
-                        <i class="fas fa-bell text-muted"></i>
-                        <span class="badge">5</span>
-                    </div>
+                    <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -199,17 +196,6 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- Head of Programme identity editor -->
-                <div class="content-card" style="margin-bottom:25px;">
-                    <div class="card-body" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
-                        <i class="fas fa-user-shield" style="color:#3498db;font-size:1.2rem;"></i>
-                        <label class="form-label" style="margin:0;">Programme:</label>
-                        <asp:TextBox ID="txtHeadOf" runat="server" CssClass="form-control" style="max-width:280px;" placeholder="e.g. Computer Science" />
-                        <asp:Button ID="btnSaveHeadOf" runat="server" Text="Save" CssClass="btn btn-primary" CausesValidation="false" OnClick="btnSaveHeadOf_Click" />
-                        <asp:Label ID="lblHeadOfMsg" runat="server" CssClass="small" />
-                    </div>
-                </div>
-
                 <!-- Stats Row -->
                 <div class="row stats-row">
                     <div class="col-md-3">
@@ -255,37 +241,56 @@
                     <div class="col-md-8">
                         <div class="content-card">
                             <div class="card-header">
-                                <h5><i class="fas fa-chart-line me-2 text-primary"></i>Student Enrolment Statistics</h5>
-                                <asp:DropDownList ID="ddlYear" runat="server" CssClass="form-select form-select-sm" style="width:120px;">
-                                    <asp:ListItem Text="2024" Value="2024"></asp:ListItem>
-                                    <asp:ListItem Text="2023" Value="2023"></asp:ListItem>
-                                    <asp:ListItem Text="2022" Value="2022"></asp:ListItem>
-                                </asp:DropDownList>
+                                <h5><i class="fas fa-chart-line me-2 text-primary"></i>Student Performance Statistics</h5>
                             </div>
-                            <div class="card-body">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-bar me-2"></i>Enrolment Chart Placeholder
-                                </div>
+                            <div class="card-body p-0">
+                                <asp:GridView ID="gvPerformance" runat="server" AutoGenerateColumns="False" CssClass="table-custom" GridLines="None" EmptyDataText="<div class='p-4 text-center text-muted'>Performance data not yet available.</div>">
+                                    <Columns>
+                                        <asp:BoundField DataField="CourseTitle" HeaderText="Course" />
+                                        <asp:TemplateField HeaderText="Attendance Rate">
+                                            <ItemTemplate>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1" style="height: 6px;">
+                                                        <div class="progress-bar bg-info" style='width: <%# Eval("AttendanceRate") %>%'></div>
+                                                    </div>
+                                                    <span style="font-size:0.85rem; font-weight:600;"><%# Eval("AttendanceRate", "{0:0.#}") %>%</span>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                        <asp:TemplateField HeaderText="Pass Rate (Marks &gt;= 50)">
+                                            <ItemTemplate>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" style='width: <%# Eval("PassRate") %>%'></div>
+                                                    </div>
+                                                    <span style="font-size:0.85rem; font-weight:600;"><%# Eval("PassRate", "{0:0.#}") %>%</span>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                    </Columns>
+                                </asp:GridView>
                             </div>
                         </div>
 
                         <div class="content-card">
                             <div class="card-header">
                                 <h5><i class="fas fa-users me-2 text-primary"></i>Recent Student Enrolments</h5>
-                                <asp:Button ID="btnViewAll" runat="server" Text="View All" CssClass="btn btn-outline-primary btn-sm" />
+                                <asp:Button ID="btnViewAll" runat="server" Text="View All" CssClass="btn btn-outline-primary btn-sm" PostBackUrl="~/ManageEnrolment.aspx" />
                             </div>
                             <div class="card-body p-0">
-                                <table class="table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>Student ID</th>
-                                            <th>Name</th>
-                                            <th>Programme</th>
-                                            <th>Enrolment Date</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                                <asp:GridView ID="gvRecentEnrolments" runat="server" AutoGenerateColumns="False" CssClass="table-custom" GridLines="None" EmptyDataText="<div class='p-4 text-center text-muted'>No recent enrolments found.</div>">
+                                    <Columns>
+                                        <asp:BoundField DataField="studentID" HeaderText="Student ID" />
+                                        <asp:BoundField DataField="studentName" HeaderText="Name" />
+                                        <asp:BoundField DataField="programmeName" HeaderText="Programme" />
+                                        <asp:BoundField DataField="enrolDate" HeaderText="Enrolment Date" DataFormatString="{0:dd MMM yyyy}" />
+                                        <asp:TemplateField HeaderText="Status">
+                                            <ItemTemplate>
+                                                <span class="badge-custom badge-info"><%# Eval("status") %></span>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                    </Columns>
+                                </asp:GridView>
                             </div>
                         </div>
                     </div>
@@ -303,10 +308,6 @@
                                 <a href="ManageEnrolment.aspx" class="quick-action">
                                     <i class="fas fa-clipboard-check" style="background:#f8d7da;color:#721c24;"></i>
                                     <div><h6>Manage Enrolment</h6><small>Review and approve enrolments</small></div>
-                                </a>
-                                <a href="AcademicCalendar.aspx" class="quick-action">
-                                    <i class="fas fa-calendar-plus" style="background:#e2e3e5;color:#383d41;"></i>
-                                    <div><h6>Update Calendar</h6><small>Manage academic calendar</small></div>
                                 </a>
                             </div>
                         </div>
@@ -333,42 +334,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-chart-pie me-2 text-success"></i>Performance Summary</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">Pass Rate</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">87%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-success" style="width:87%"></div></div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">Attendance Rate</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">92%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-info" style="width:92%"></div></div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">Course Completion</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">78%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-warning" style="width:78%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span style="font-size:0.85rem;">Student Satisfaction</span>
-                                        <span style="font-size:0.85rem;font-weight:600;">94%</span>
-                                    </div>
-                                    <div class="progress"><div class="progress-bar bg-success" style="width:94%"></div></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -378,3 +343,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+                <div class="nav-item"><a href="Reports.aspx" class="nav-link"><i class="fas fa-file-export"></i><span>Reports</span></a></div>

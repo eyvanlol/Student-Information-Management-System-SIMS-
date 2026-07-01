@@ -20,48 +20,17 @@ namespace StudentManagementSystem
                 if (!IsPostBack)
                 {
                     LoadStats();
+                    LoadRecentEnrolments();
+                    LoadPerformanceStats();
                 }
             }
         }
 
         private void LoadIdentity()
         {
-            try
-            {
-                object o = DbHelper.ExecuteScalar(
-                    "SELECT headOf FROM HOP_ADMIN WHERE adminID = @id",
-                    new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
-                string h = (o == null || o == DBNull.Value) ? "" : o.ToString();
-                string identity = string.IsNullOrEmpty(h) ? "Head of Programme" : "Head of Programme, " + h;
-                lblRoleIdentity.Text = identity;
-                Session["RoleIdentity"] = identity;     // share with every other admin page
-                if (!IsPostBack)
-                    txtHeadOf.Text = h;
-            }
-            catch
-            {
-                // headOf column not present yet (PATCH 11) -> keep default label.
-            }
-        }
-
-        protected void btnSaveHeadOf_Click(object sender, EventArgs e)
-        {
-            string h = txtHeadOf.Text.Trim();
-            try
-            {
-                DbHelper.ExecuteNonQuery(
-                    "UPDATE HOP_ADMIN SET headOf = @h WHERE adminID = @id",
-                    new SqlParameter("@h", string.IsNullOrEmpty(h) ? (object)DBNull.Value : h),
-                    new SqlParameter("@id", Convert.ToInt32(Session["UserID"])));
-
-                lblRoleIdentity.Text = string.IsNullOrEmpty(h) ? "Head of Programme" : "Head of Programme, " + h;
-                Session["RoleIdentity"] = lblRoleIdentity.Text;   // push update to other pages
-                lblHeadOfMsg.Text = "<span class='text-success'><i class='fas fa-check-circle me-1'></i>Saved.</span>";
-            }
-            catch (Exception ex)
-            {
-                lblHeadOfMsg.Text = "<span class='text-danger'>Could not save: " + ex.Message + "</span>";
-            }
+            // Admin identity is fixed to "Admin" — no Head-of-Programme title.
+            lblRoleIdentity.Text = "Admin";
+            Session["RoleIdentity"] = "Admin";
         }
 
         private void LoadStats()
@@ -89,6 +58,67 @@ namespace StudentManagementSystem
             catch (SqlException)
             {
                 return 0; // table not created yet
+            }
+        }
+
+        private void LoadRecentEnrolments()
+        {
+            try
+            {
+                string sql = @"
+                    SELECT TOP 5
+                        e.studentID,
+                        s.name AS studentName,
+                        p.programmeName,
+                        e.enrolDate,
+                        e.status
+                    FROM ENROLMENT e
+                    JOIN STUDENT s ON e.studentID = s.studentID
+                    JOIN PROGRAMME p ON s.programmeID = p.programmeID
+                    ORDER BY e.enrolDate DESC";
+
+                System.Data.DataTable dt = DbHelper.ExecuteQuery(sql);
+                gvRecentEnrolments.DataSource = dt;
+                gvRecentEnrolments.DataBind();
+            }
+            catch
+            {
+                // Fails silently if tables are not fully set up yet
+            }
+        }
+
+        private void LoadPerformanceStats()
+        {
+            try
+            {
+                // Attendance Rate from 'Present' status; Pass Rate from marks >= 50
+                string sql = @"
+                    SELECT 
+                        c.courseCode + ' - ' + c.courseName AS CourseTitle,
+                        ISNULL(att.AttRate, 0) AS AttendanceRate,
+                        ISNULL(res.PassRate, 0) AS PassRate
+                    FROM COURSE c
+                    LEFT JOIN (
+                        SELECT courseID, 
+                               CAST(SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) AS DECIMAL(5,1)) AS AttRate
+                        FROM ATTENDANCE
+                        GROUP BY courseID
+                    ) att ON c.courseID = att.courseID
+                    LEFT JOIN (
+                        SELECT courseID, 
+                               CAST(SUM(CASE WHEN marks >= 50 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) AS DECIMAL(5,1)) AS PassRate
+                        FROM RESULT
+                        GROUP BY courseID
+                    ) res ON c.courseID = res.courseID
+                    WHERE c.status = 'Active'";
+
+                System.Data.DataTable dt = DbHelper.ExecuteQuery(sql);
+                gvPerformance.DataSource = dt;
+                gvPerformance.DataBind();
+            }
+            catch
+            {
+                // Fails silently if ATTENDANCE or RESULT tables are not fully set up yet
             }
         }
 

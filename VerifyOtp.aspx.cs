@@ -75,6 +75,7 @@ namespace StudentManagementSystem
             Session.Remove("PendingOtpName");
             Session.Remove("PendingOtpEmail");
             Session.Remove("PendingOtpPersonal");
+            Session.Remove("PendingOtpTempPassword");
 
             FormsAuthentication.SetAuthCookie(email, true);
             Response.Redirect("StudentDashboard.aspx");
@@ -86,6 +87,7 @@ namespace StudentManagementSystem
             string personal = Convert.ToString(Session["PendingOtpPersonal"]);
             string name = Convert.ToString(Session["PendingOtpName"]);
             string collegeEmail = Convert.ToString(Session["PendingOtpEmail"]);
+            string tempPassword = Convert.ToString(Session["PendingOtpTempPassword"]);   // stashed at login
 
             string otp = _rng.Next(0, 1000000).ToString("D6");
             DateTime expiry = DateTime.Now.AddHours(24);
@@ -96,9 +98,23 @@ namespace StudentManagementSystem
                 new SqlParameter("@e", expiry),
                 new SqlParameter("@id", studentID));
 
+            // Student code is the part of the college email before '@' (e.g. stu2606005@... -> STU2606005)
+            string studentCode = collegeEmail.Contains("@")
+                ? collegeEmail.Substring(0, collegeEmail.IndexOf('@')).ToUpper()
+                : collegeEmail.ToUpper();
+
             try
             {
-                EmailHelper.SendOtp(personal, name, collegeEmail, otp);
+                if (!string.IsNullOrEmpty(tempPassword))
+                {
+                    // Full email: login email + temporary password, with the OTP at the end.
+                    EmailHelper.SendStudentWelcome(personal, name, studentCode, collegeEmail, tempPassword, otp);
+                }
+                else
+                {
+                    // Fallback: the temp password isn't in this session, so send the code only.
+                    EmailHelper.SendOtp(personal, name, collegeEmail, otp);
+                }
                 ShowSuccess("A new code has been sent to " + MaskEmail(personal) + ".");
             }
             catch (Exception ex)

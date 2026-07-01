@@ -291,18 +291,18 @@ namespace StudentManagementSystem
             }
         }
 
-        protected void btnLogout_Click(object sender, EventArgs e)
-        {
-            Session.Clear();
-            Session.Abandon();
-            Response.Redirect("Login.aspx");
-        }
-
         private void ShowMessage(string text, bool ok)
         {
             pnlMsg.Visible = true;
             divMsg.Attributes["class"] = ok ? "alert alert-success" : "alert alert-danger";
             litMsg.Text = $"<i class='fas {(ok ? "fa-check-circle" : "fa-exclamation-circle")} me-2'></i>{text}";
+        }
+
+        protected void btnLogout_Click(object sender, EventArgs e)
+        {
+            Session.Clear();
+            Session.Abandon();
+            Response.Redirect("Login.aspx");
         }
     }
 }

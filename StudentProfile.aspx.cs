@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace StudentManagementSystem
 {
@@ -31,6 +32,7 @@ namespace StudentManagementSystem
             if (!IsPostBack)
             {
                 LoadProfile();
+                LoadProfilePicture();
             }
         }
 
@@ -211,6 +213,108 @@ namespace StudentManagementSystem
             Session.Clear();
             Session.Abandon();
             Response.Redirect("Login.aspx");
+        }
+
+        // ══════════════════════════════════════════════════════
+        // PROFILE PICTURE  (file-based, no database column needed)
+        // Files are stored as ~/Uploads/ProfilePictures/student_{id}.{ext}
+        // ══════════════════════════════════════════════════════
+        private string GetProfilePictureUrl()
+        {
+            int studentId = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+            string imageUrl = "~/Uploads/ProfilePictures/default.png";
+
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "student_" + studentId + ext);
+                if (File.Exists(filePath))
+                {
+                    // ?v= busts the browser cache so a freshly uploaded picture shows immediately
+                    imageUrl = "~/Uploads/ProfilePictures/student_" + studentId + ext + "?v=" + DateTime.Now.Ticks;
+                    break;
+                }
+            }
+
+            return imageUrl;
+        }
+
+        private void LoadProfilePicture()
+        {
+            imgProfilePic.ImageUrl = GetProfilePictureUrl();
+        }
+
+        protected void btnUpload_Click(object sender, EventArgs e)
+        {
+            lblUploadMsg.CssClass = "text-warning d-block mt-2";
+
+            if (!fuProfilePic.HasFile)
+            {
+                lblUploadMsg.Text = "Please select an image file.";
+                return;
+            }
+
+            string ext = Path.GetExtension(fuProfilePic.FileName).ToLower();
+            if (ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".gif")
+            {
+                lblUploadMsg.Text = "Only JPG, PNG, or GIF files allowed.";
+                return;
+            }
+
+            if (fuProfilePic.PostedFile.ContentLength > 2 * 1024 * 1024)
+            {
+                lblUploadMsg.Text = "File size must be less than 2MB.";
+                return;
+            }
+
+            int studentId = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
+
+            // Remove any previous picture (any extension) before saving the new one
+            DeleteExistingProfilePictures(studentId, uploadPath);
+
+            string fullPath = Path.Combine(uploadPath, "student_" + studentId + ext);
+
+            try
+            {
+                fuProfilePic.SaveAs(fullPath);
+                lblUploadMsg.CssClass = "text-success d-block mt-2";
+                lblUploadMsg.Text = "Profile picture updated!";
+                LoadProfilePicture();
+            }
+            catch (Exception ex)
+            {
+                lblUploadMsg.CssClass = "text-danger d-block mt-2";
+                lblUploadMsg.Text = "Error: " + ex.Message;
+            }
+        }
+
+        protected void btnRemovePic_Click(object sender, EventArgs e)
+        {
+            int studentId = Convert.ToInt32(Session["UserID"]);
+            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
+
+            DeleteExistingProfilePictures(studentId, uploadPath);
+
+            lblUploadMsg.CssClass = "text-success d-block mt-2";
+            lblUploadMsg.Text = "Profile picture removed.";
+            LoadProfilePicture();
+        }
+
+        private void DeleteExistingProfilePictures(int studentId, string uploadPath)
+        {
+            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
+            foreach (string ext in extensions)
+            {
+                string filePath = Path.Combine(uploadPath, "student_" + studentId + ext);
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
         }
     }
 }

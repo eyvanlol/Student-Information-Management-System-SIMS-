@@ -24,6 +24,15 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
+        /// ucNotificationBell control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::StudentManagementSystem.NotificationBell ucNotificationBell;
+
+        /// <summary>
         /// lblUserName control.
         /// </summary>
         /// <remarks>
@@ -202,5 +211,20 @@ namespace StudentManagementSystem
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView gvEnrolmentRecords;
+
+        /// <summary>
+        /// ddlResultCourse control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.DropDownList ddlResultCourse;
+
+        /// <summary>
+        /// btnFilterResults control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnFilterResults;
+
+        /// <summary>
+        /// gvResults control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvResults;
     }
 }

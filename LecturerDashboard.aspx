@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LecturerDashboard.aspx.cs" Inherits="StudentManagementSystem.LecturerDashboard" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,18 +14,9 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+            width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column;
             background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            color: white; z-index: 1000; transition: all 0.3s; overflow-y: auto;
-        }
-        .sidebar-avatar {
-            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 10px;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-        .sidebar-avatar img {
-            width: 70px; height: 70px; object-fit: cover; border-radius: 50%;
-            display: block;
+            color: white; z-index: 1000; transition: all 0.3s; overflow: hidden;
         }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header .logo {
@@ -42,7 +34,8 @@
         .nav-link:hover, .nav-link.active { background: rgba(155,89,182,0.15); color: white; border-left-color: #9b59b6; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; }
         .topbar {
@@ -113,15 +106,10 @@
 <body>
 <form id="form1" runat="server">
 
-    <!-- Sidebar -->
+    <!-- ── Sidebar ── -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-avatar">
-                <asp:Image ID="imgSidebarAvatar" runat="server" 
-                    Width="70" Height="70"
-                    ImageUrl="~/Uploads/ProfilePictures/default.png" 
-                    AlternateText="Avatar" />
-            </div>
+            <div class="logo"><i class="fas fa-chalkboard-teacher"></i></div>
             <h4><asp:Label ID="lblUserName" runat="server" Text="Lecturer"></asp:Label></h4>
             <small><asp:Label ID="lblRoleIdentity" runat="server" Text="Lecturer"></asp:Label></small>
         </div>
@@ -130,9 +118,8 @@
             <div class="nav-item"><a href="LecturerProfile.aspx"      class="nav-link"><i class="fas fa-user-circle"></i><span>My Profile</span></a></div>
             <div class="nav-item"><a href="LecturerCourses.aspx"      class="nav-link"><i class="fas fa-book"></i><span>My Courses</span></a></div>
             <div class="nav-item"><a href="LecturerAttendance.aspx"   class="nav-link"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></div>
-            <div class="nav-item"><a href="ManageGrades.aspx"         class="nav-link"><i class="fas fa-clipboard-list"></i><span>Grades & Assessments</span></a></div>
-            <div class="nav-item"><a href="AtRiskStudents.aspx"       class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>At Risk Students</span></a></div>
-            <div class="nav-item"><a href="LecturerStudentProgress.aspx"       class="nav-link"><i class="fas fa-chart-bar"></i><span>Student Progress</span></a></div>
+            <div class="nav-item"><a href="ManageGrades.aspx"         class="nav-link"><i class="fas fa-clipboard-list"></i><span>Grades &amp; Assessments</span></a></div>
+            <div class="nav-item"><a href="AtRiskStudents.aspx"       class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>AtRisk Students</span></a></div>
             <div class="nav-item"><a href="LecturerAnnouncements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
         </nav>
         <div class="sidebar-footer">
@@ -142,7 +129,7 @@
         </div>
     </div>
 
-    <!-- Main -->
+  <!-- ── Main ── -->
     <div class="main-content">
         <div class="topbar">
             <h2><i class="fas fa-home me-2" style="color:#9b59b6;"></i>Lecturer Dashboard</h2>
@@ -210,7 +197,6 @@
                     <div class="content-card">
                         <div class="card-header">
                             <h5><i class="fas fa-book me-2" style="color:#9b59b6;"></i>My Courses</h5>
-                            <asp:Button ID="btnManageCourses" runat="server" Text="Manage Courses" CssClass="btn btn-outline-primary btn-sm" />
                         </div>
                         <div class="card-body">
                             <asp:Repeater ID="rptCourses" runat="server">
@@ -232,7 +218,7 @@
                     <div class="content-card">
                         <div class="card-header">
                             <h5><i class="fas fa-edit me-2" style="color:#9b59b6;"></i>Recent Grade Entries</h5>
-                            <asp:Button ID="btnEnterGrades" runat="server" Text="Enter Grades" CssClass="btn btn-outline-primary btn-sm" />
+                            <asp:Button ID="btnEnterGrades" runat="server" Text="Enter Grades" CssClass="btn btn-outline-primary btn-sm" PostBackUrl="~/ManageGrades.aspx"/>
                         </div>
                         <div class="card-body p-0">
                             <table class="table-custom">
@@ -286,7 +272,7 @@
                                     </div>
                                 </ItemTemplate>
                             </asp:Repeater>
-                            <asp:Label ID="lblNoAtRisk" runat="server" Text="✅ All students above 85% attendance!" Visible="false" CssClass="text-success fw-bold"></asp:Label>
+                            <asp:Label ID="lblNoAtRisk" runat="server" Text="✅ All students above 80% attendance!" Visible="false" CssClass="text-success fw-bold"></asp:Label>
                         </div>
                     </div>
 
@@ -313,9 +299,10 @@
                         </div>
                         <div class="card-body">
                             <div style="display:flex;flex-direction:column;gap:10px;">
-                                <asp:Button ID="btnTakeAttendance"  runat="server" Text="Take Attendance"       CssClass="btn btn-primary w-100"         style="background:#9b59b6;border:none;border-radius:10px;padding:12px;" />
-                                <asp:Button ID="btnPostMaterial"    runat="server" Text="Post Course Material"  CssClass="btn btn-outline-primary w-100" style="border-radius:10px;padding:12px;" />
-                                <asp:Button ID="btnSendAnnouncement" runat="server" Text="Send Announcement"   CssClass="btn btn-outline-primary w-100" style="border-radius:10px;padding:12px;" />
+                                <asp:Button ID="btnTakeAttendance" runat="server" Text="Take Attendance" CssClass="btn btn-primary w-100" style="background:#9b59b6;border:none;border-radius:10px;padding:12px;" PostBackUrl="~/LecturerAttendance.aspx"/>
+                                
+                                <asp:Button ID="btnSendAnnouncement" runat="server" Text="Send Announcement" CssClass="btn btn-outline-primary w-100" style="border-radius:10px;padding:12px;" PostBackUrl="~/LecturerAnnouncements.aspx" />
+                                
                                 <asp:Button ID="btnViewProgress" runat="server" Text="View Student Progress" CssClass="btn btn-outline-primary w-100" style="border-radius:10px;padding:12px;" OnClick="btnViewProgress_Click" />
                             </div>
                         </div>

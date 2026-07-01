@@ -67,7 +67,6 @@ namespace StudentManagementSystem
             int studentId = Convert.ToInt32(Session["UserID"]);
 
             LoadProgramme(studentId);
-            LoadNotifCount(studentId);
             LoadWindowStatus();
             LoadUpcomingCourses(studentId);
             LoadCurrentCourses(studentId);
@@ -96,29 +95,6 @@ namespace StudentManagementSystem
                 }
             }
             catch { lblProgramme.Text = ""; }
-        }
-
-        // ══════════════════════════════════════════════════════
-        // LOAD NOTIFICATION COUNT FOR BELL
-        // ══════════════════════════════════════════════════════
-        private void LoadNotifCount(int studentId)
-        {
-            try
-            {
-                string sql = @"
-                    SELECT COUNT(*) FROM NOTIFICATION
-                    WHERE recipientID = @sid AND recipientRole = 'student' AND isRead = 0";
-
-                using (SqlConnection conn = DbHelper.GetConnection())
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@sid", studentId);
-                    conn.Open();
-                    object r = cmd.ExecuteScalar();
-                    lblBellCount.Text = (r != null && r != DBNull.Value) ? r.ToString() : "0";
-                }
-            }
-            catch { lblBellCount.Text = "0"; }
         }
 
         // ══════════════════════════════════════════════════════

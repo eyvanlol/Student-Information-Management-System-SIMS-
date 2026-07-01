@@ -1,4 +1,5 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentDashboard.aspx.cs" Inherits="StudentManagementSystem.StudentDashboard" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -153,6 +154,7 @@
                 <div class="nav-item"><a href="StudentAttendance.aspx" class="nav-link"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></div>
                 <div class="nav-item"><a href="StudentResult.aspx" class="nav-link"><i class="fas fa-chart-line"></i><span>Results</span></a></div>
                 <div class="nav-item"><a href="StudentTranscript.aspx" class="nav-link"><i class="fas fa-file-alt"></i><span>Transcript</span></a></div>
+                <div class="nav-item"><a href="StudentCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>My Calendar</span></a></div>
                 <div class="nav-item"><a href="StudentNotifications.aspx" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a></div>
                 <div class="nav-item"><a href="StudentProfile.aspx" class="nav-link"><i class="fas fa-user-circle"></i><span>Profile</span></a></div>
             </nav>
@@ -168,10 +170,7 @@
         <div class="topbar">
             <h2><i class="fas fa-home me-2" style="color:#1abc9c;"></i>Student Dashboard</h2>
             <div class="topbar-actions">
-                <div class="notification-bell" style="cursor:pointer;" onclick="location.href='StudentNotifications.aspx'" title="View notifications">
-                    <i class="fas fa-bell text-muted"></i>
-                    <span class="badge"><asp:Label ID="lblBellCount" runat="server" Text="0"></asp:Label></span>
-                </div>
+                <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                 <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>

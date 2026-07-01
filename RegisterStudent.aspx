@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegisterStudent.aspx.cs" Inherits="StudentManagementSystem.RegisterStudent" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -91,7 +92,6 @@
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
                 <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
 
             <div class="sidebar-footer">
@@ -106,7 +106,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-user-graduate me-2" style="color:#3498db;"></i>Register New Student</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications"><i class="fas fa-bell text-muted"></i><span class="badge">4</span></div>
+                    <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -272,3 +272,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+                <div class="nav-item"><a href="Reports.aspx" class="nav-link"><i class="fas fa-file-export"></i><span>Reports</span></a></div>

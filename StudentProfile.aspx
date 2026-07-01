@@ -81,6 +81,21 @@
         .profile-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; }
         .profile-header p { margin: 5px 0 0; opacity: 0.7; font-size: 0.9rem; }
 
+        /* ── Profile picture upload ── */
+        .profile-avatar { position: relative; }
+        .profile-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .edit-pic-btn {
+            position: absolute; bottom: 0; right: 0;
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #1abc9c; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid #fff; font-size: 0.75rem;
+            transition: background 0.2s;
+        }
+        .edit-pic-btn:hover { background: #16a085; }
+        .hidden-file-input { display: none; }
+        .pic-upload-controls { margin-top: 10px; }
+
         /* ── INFO SECTIONS ── */
         .info-section { padding: 28px 30px; border-bottom: 1px solid #f0f0f0; }
         .info-section:last-child { border-bottom: none; }
@@ -204,10 +219,26 @@
                     <div class="profile-card">
                         <div class="profile-header">
                             <div class="profile-avatar">
-                                <i class="fas fa-user-graduate"></i>
+                                <asp:Image ID="imgProfilePic" runat="server"
+                                    ImageUrl="~/Uploads/ProfilePictures/default.png"
+                                    AlternateText="Profile Picture" />
+                                <label for="<%= fuProfilePic.ClientID %>" class="edit-pic-btn" title="Change profile picture">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </label>
                             </div>
                             <h3><asp:Label ID="lblProfileName" runat="server" Text="Student Name"></asp:Label></h3>
                             <p><asp:Label ID="lblProfileProgramme" runat="server" Text="Programme"></asp:Label></p>
+
+                            <div class="pic-upload-controls">
+                                <asp:FileUpload ID="fuProfilePic" runat="server"
+                                    CssClass="hidden-file-input" accept=".jpg,.jpeg,.png,.gif" />
+                                <asp:Button ID="btnUpload" runat="server" Text="Upload"
+                                    CssClass="btn btn-light btn-sm" OnClick="btnUpload_Click" />
+                                <asp:Button ID="btnRemovePic" runat="server" Text="Remove"
+                                    CssClass="btn btn-outline-light btn-sm ms-2" OnClick="btnRemovePic_Click"
+                                    OnClientClick="return confirm('Remove profile picture?');" />
+                                <asp:Label ID="lblUploadMsg" runat="server" CssClass="d-block mt-2" style="font-size:0.8rem;"></asp:Label>
+                            </div>
                         </div>
 
                         <!-- Academic Information -->
@@ -296,4 +327,18 @@
                             <div class="info-row">
                                 <div class="info-label">Relationship</div>
                                 <asp:Label ID="lblEmergencyRel" runat="server" CssClass="info-value" Text="—" style="background:white;border:1px solid #ffe082;"></asp:Label>
-       
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Phone Number</div>
+                                <asp:Label ID="lblEmergencyPhone" runat="server" CssClass="info-value" Text="—" style="background:white;border:1px solid #ffe082;"></asp:Label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

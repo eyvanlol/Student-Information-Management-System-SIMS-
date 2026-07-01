@@ -288,7 +288,6 @@ namespace StudentManagementSystem
                 }
 
                 lblUnreadNotif.Text = unread.ToString();
-                lblBellCount.Text = unread.ToString();
                 //lblNotifCount.Text = unread > 0 ? $" ({unread})" : "";
 
                 if (dt.Rows.Count > 0)
@@ -306,7 +305,6 @@ namespace StudentManagementSystem
             {
                 pnlNoNotif.Visible = true;
                 lblUnreadNotif.Text = "0";
-                lblBellCount.Text = "0";
             }
         }
 

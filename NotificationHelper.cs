@@ -167,6 +167,50 @@ namespace StudentManagementSystem
         }
 
         // =====================================================================
+        // READ SIDE — role-aware (used by the shared NotificationBell control)
+        // These are additive; the student-specific methods above are unchanged.
+        // =====================================================================
+
+        /// <summary>
+        /// Unread count for ANY user, keyed by the Session["UserRole"] string
+        /// ("Student" / "Lecturer" / "Admin"). Also counts broadcast ('all') rows.
+        /// </summary>
+        public static int GetUnreadCountForUser(int userID, string role)
+        {
+            const string sql = @"
+                SELECT COUNT(*) FROM NOTIFICATION
+                WHERE recipientID = @id AND recipientRole IN (@role, 'all') AND isRead = 0;";
+            object o = DbHelper.ExecuteScalar(sql, P("@id", userID), P("@role", NormalizeRole(role)));
+            return (o == null || o == DBNull.Value) ? 0 : Convert.ToInt32(o);
+        }
+
+        /// <summary>
+        /// The N most recent UNREAD notifications for ANY user, by role.
+        /// Feeds the bell dropdown preview.
+        /// </summary>
+        public static DataTable GetRecentUnreadForUser(int userID, string role, int top = 6)
+        {
+            const string sql = @"
+                SELECT TOP (@top) notificationID, notifType, title, message, courseID, isRead, createdAt
+                FROM   NOTIFICATION
+                WHERE  recipientID = @id AND recipientRole IN (@role, 'all') AND isRead = 0
+                ORDER  BY createdAt DESC, notificationID DESC;";
+            return DbHelper.ExecuteQuery(sql, P("@top", top), P("@id", userID), P("@role", NormalizeRole(role)));
+        }
+
+        /// <summary>Maps the capitalised Session role to the lowercase recipientRole stored in NOTIFICATION.</summary>
+        private static string NormalizeRole(string role)
+        {
+            if (string.IsNullOrEmpty(role)) return "student";
+            switch (role.Trim().ToLowerInvariant())
+            {
+                case "lecturer": return "lecturer";
+                case "admin": return "admin";
+                default: return "student";
+            }
+        }
+
+        // =====================================================================
         // READ SIDE — lecturer "my past announcements"
         // =====================================================================
 

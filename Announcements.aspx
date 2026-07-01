@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Announcements.aspx.cs" Inherits="StudentManagementSystem.Announcements" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -166,7 +167,6 @@
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
                 <div class="nav-item"><a href="Announcements.aspx" class="nav-link active"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -180,10 +180,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-bullhorn me-2 text-primary"></i>Announcements</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
-                        <i class="fas fa-bell text-muted"></i>
-                        <span class="badge">5</span>
-                    </div>
+                    <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -458,3 +455,5 @@
 </script>
 </body>
 </html>
+
+                <div class="nav-item"><a href="Reports.aspx" class="nav-link"><i class="fas fa-file-export"></i><span>Reports</span></a></div>

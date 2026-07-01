@@ -110,6 +110,8 @@ namespace StudentManagementSystem
             string tempPwd = GenTempPassword();
             string hashed = Login.HashPassword(tempPwd);
             string tmpEmail = "pending_" + Guid.NewGuid().ToString("N") + "@temp.local";
+            string otp = new Random().Next(0, 1000000).ToString("D6");   // 6-digit activation code
+            DateTime otpExpiry = DateTime.Now.AddHours(24);
 
             int newId;
             string email, code;
@@ -122,9 +124,11 @@ namespace StudentManagementSystem
                     string insert = @"
                         INSERT INTO STUDENT
                             (name, email, password, programmeID, personalEmail, phone, icNumber,
-                             intakeSemester, emergencyContactName, emergencyContactPhone, emergencyContactRel)
+                             intakeSemester, emergencyContactName, emergencyContactPhone, emergencyContactRel,
+                             otpCode, otpExpiry, isActivated)
                         VALUES
-                            (@name, @tmp, @pwd, @prog, @pe, @ph, @ic, @intake, @en, @ep, @er);
+                            (@name, @tmp, @pwd, @prog, @pe, @ph, @ic, @intake, @en, @ep, @er,
+                             @otp, @exp, 0);
                         SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                     using (SqlCommand cmd = new SqlCommand(insert, conn, tx))
@@ -140,6 +144,8 @@ namespace StudentManagementSystem
                         cmd.Parameters.AddWithValue("@en", NullIfBlank(txtEmgName.Text));
                         cmd.Parameters.AddWithValue("@ep", NullIfBlank(txtEmgPhone.Text));
                         cmd.Parameters.AddWithValue("@er", NullIfBlank(txtEmgRel.Text));
+                        cmd.Parameters.AddWithValue("@otp", otp);
+                        cmd.Parameters.AddWithValue("@exp", otpExpiry);
                         newId = Convert.ToInt32(cmd.ExecuteScalar());
                     }
 
@@ -162,8 +168,15 @@ namespace StudentManagementSystem
                 "Welcome to SIMS",
                 "Your student account has been created. Log in with " + email + " and change your password on first login.");
 
-            TrySendWelcomeEmail(personalEmail, email, code, GenTempPasswordEcho());
-            ShowCredential("Student", code, email, GenTempPasswordEcho());
+            bool emailed = TrySendWelcomeEmail(personalEmail, name, email, code, tempPwd, otp);
+            ShowCredential("Student", code, email, tempPwd);
+            if (emailed)
+                ShowMessage("Student account created. Login email, temporary password and activation code were sent to "
+                            + personalEmail + ".", true);
+            else
+                ShowMessage("Student account created, but the welcome email could NOT be sent"
+                            + (string.IsNullOrEmpty(_lastEmailError) ? "" : ": " + _lastEmailError)
+                            + ". Share the credentials below manually.", false);
         }
 
         private void CreateLecturer(string name, string personalEmail)
@@ -389,12 +402,29 @@ namespace StudentManagementSystem
             cmd.Parameters.AddWithValue("@ic", (object)ic ?? DBNull.Value);
         }
 
-        // Email delivery is stubbed until SMTP settings exist in Web.config.
-        // Wrapped so a future real implementation can't crash account creation.
-        private void TrySendWelcomeEmail(string toPersonal, string loginEmail, string code, string tempPwd)
+        // Sends the welcome email (login email + temporary password + activation code)
+        // via EmailHelper. Wrapped so a delivery failure can't crash account creation —
+        // the account is already saved and the credentials are shown on screen.
+        private string _lastEmailError;
+        private bool TrySendWelcomeEmail(string toPersonal, string studentName,
+                                         string loginEmail, string code, string tempPwd, string otp)
         {
-            try { /* TODO: configure System.Net.Mail.SmtpClient and send here */ }
-            catch { /* swallow — account is already created; credentials shown on screen */ }
+            _lastEmailError = null;
+            if (string.IsNullOrWhiteSpace(toPersonal))
+            {
+                _lastEmailError = "no personal email on file";
+                return false;
+            }
+            try
+            {
+                EmailHelper.SendStudentWelcome(toPersonal, studentName, code, loginEmail, tempPwd, otp);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastEmailError = ex.Message;
+                return false;
+            }
         }
 
         // We show the password once, on screen. To keep the plaintext available for

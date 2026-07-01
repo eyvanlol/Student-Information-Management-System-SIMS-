@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 
 namespace StudentManagementSystem
@@ -36,8 +36,6 @@ namespace StudentManagementSystem
 
             int unread = NotificationHelper.GetUnreadCount(StudentID);
             lblUnreadCount.Text = unread + " unread";
-            lblBellBadge.Text = unread.ToString();
-            lblBellBadge.Visible = unread > 0;
             btnMarkAll.Visible = unread > 0;
         }
 

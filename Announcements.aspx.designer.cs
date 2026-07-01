@@ -42,6 +42,15 @@ namespace StudentManagementSystem
         protected global::System.Web.UI.WebControls.LinkButton btnLogout;
 
         /// <summary>
+        /// ucNotificationBell control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::StudentManagementSystem.NotificationBell ucNotificationBell;
+
+        /// <summary>
         /// lblTopUserName control.
         /// </summary>
         /// <remarks>

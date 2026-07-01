@@ -1,4 +1,5 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageEnrolment.aspx.cs" Inherits="StudentManagementSystem.ManageEnrolment" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageEnrolment.aspx.cs" Inherits="StudentManagementSystem.ManageEnrolment" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -143,7 +144,6 @@
                 <div class="nav-item"><a href="ManageEnrolment.aspx" class="nav-link active"><i class="fas fa-clipboard-check"></i><span>Enrolment</span></a></div>
                 <div class="nav-item"><a href="StudentStatistics.aspx" class="nav-link"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></div>
                 <div class="nav-item"><a href="Announcements.aspx" class="nav-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a></div>
-                <div class="nav-item"><a href="AcademicCalendar.aspx" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Academic Calendar</span></a></div>
             </nav>
         <div class="sidebar-footer">
             <asp:LinkButton ID="btnLogout" runat="server" CssClass="nav-link" OnClick="btnLogout_Click" style="padding:10px 0;">
@@ -157,10 +157,7 @@
             <div class="topbar">
                 <h2><i class="fas fa-clipboard-check me-2 text-primary"></i>Manage Enrolment</h2>
                 <div class="topbar-actions">
-                    <div class="notification-bell" style="cursor:pointer;" onclick="location.href='Announcements.aspx'" title="View notifications">
-                        <i class="fas fa-bell text-muted"></i>
-                        <span class="badge">5</span>
-                    </div>
+                    <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -188,6 +185,9 @@
                 </button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-records', this)">
                     <i class="fas fa-list"></i>Enrolment Records
+                </button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-results', this)">
+                    <i class="fas fa-graduation-cap"></i>Results &amp; Retake
                 </button>
             </div>
 
@@ -390,6 +390,94 @@
                                     </ItemTemplate>
                                 </asp:TemplateField>
                                 <asp:BoundField DataField="enrolDate" HeaderText="Date" DataFormatString="{0:d MMM yyyy}" />
+                            </Columns>
+                        </asp:GridView>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════
+                 TAB 5 — RESULTS & RETAKE  (TASK 1)
+            ══════════════════════════════════════════════ -->
+            <div id="tab-results" class="tab-panel">
+                <div class="content-card">
+                    <div class="card-header-custom">
+                        <h5><i class="fas fa-graduation-cap me-2 text-warning"></i>Published Results — Fail / Retake Notifications</h5>
+                    </div>
+                    <div class="card-body-custom">
+                        <!-- Filter -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label-custom">Filter by Course</label>
+                                <asp:DropDownList ID="ddlResultCourse" runat="server" CssClass="form-select"></asp:DropDownList>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <asp:Button ID="btnFilterResults" runat="server" Text="Apply Filter" CssClass="btn-primary-custom w-100" OnClick="btnFilterResults_Click" />
+                            </div>
+                        </div>
+
+                        <p style="font-size:0.82rem;color:#6c757d;margin-bottom:15px;">
+                            Results below 50 marks are flagged <strong>Fail</strong>. Use
+                            <strong>Mark Retake</strong> to require a retake, then
+                            <strong>Notify Student</strong> to email their personal address and post an
+                            in-app notification. The <em>Notified</em> column records the last time an email was sent.
+                        </p>
+
+                        <asp:GridView
+                            ID="gvResults"
+                            runat="server"
+                            AutoGenerateColumns="false"
+                            CssClass="table-custom"
+                            OnRowCommand="gvResults_RowCommand"
+                            EmptyDataText="No published results yet."
+                            EmptyDataRowStyle-CssClass="text-center p-4 text-muted">
+                            <Columns>
+                                <asp:BoundField DataField="studentName" HeaderText="Student" />
+                                <asp:BoundField DataField="studentCode" HeaderText="Student ID" ItemStyle-CssClass="font-monospace" />
+                                <asp:BoundField DataField="courseCode"  HeaderText="Course"     ItemStyle-CssClass="font-monospace" />
+                                <asp:BoundField DataField="marks"       HeaderText="Marks"      DataFormatString="{0:0.00}" />
+                                <asp:BoundField DataField="grade"       HeaderText="Grade"      />
+                                <asp:TemplateField HeaderText="Outcome">
+                                    <ItemTemplate>
+                                        <span class='<%# OutcomeBadge(Eval("marks")) %>'><%# OutcomeText(Eval("marks")) %></span>
+                                        <asp:Label runat="server"
+                                            Visible='<%# Convert.ToBoolean(Eval("retakeRequired")) %>'
+                                            CssClass="badge-pending" Text="Retake" style="margin-left:5px;"></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Personal Email">
+                                    <ItemTemplate>
+                                        <%# string.IsNullOrEmpty(Eval("personalEmail").ToString())
+                                                ? "<span class='text-muted'>— none —</span>"
+                                                : System.Web.HttpUtility.HtmlEncode(Eval("personalEmail").ToString()) %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Notified">
+                                    <ItemTemplate><%# NotifiedText(Eval("failNotifiedAt")) %></ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Action">
+                                    <ItemTemplate>
+                                        <asp:LinkButton ID="btnToggleRetake" runat="server"
+                                            CommandName="ToggleRetake"
+                                            CommandArgument='<%# Eval("resultID") %>'
+                                            CssClass="btn-primary-custom me-1" style="padding:6px 12px;"
+                                            Visible='<%# CanRetake(Eval("marks"), Eval("retakeRequired")) %>'>
+                                            <%# RetakeBtnText(Eval("retakeRequired")) %>
+                                        </asp:LinkButton>
+                                        <asp:Label runat="server"
+                                            Visible='<%# !CanRetake(Eval("marks"), Eval("retakeRequired")) %>'
+                                            CssClass="text-muted" style="font-size:0.8rem;"
+                                            Text="Passed — no retake"></asp:Label>
+                                        <asp:LinkButton ID="btnNotify" runat="server"
+                                            CommandName="NotifyStudent"
+                                            CommandArgument='<%# Eval("resultID") %>'
+                                            CssClass="btn-success-custom"
+                                            Visible='<%# CanNotify(Eval("marks"), Eval("retakeRequired")) %>'
+                                            OnClientClick="return confirm('Email this student about their Fail / Retake status?');">
+                                            <i class="fas fa-envelope me-1"></i>Notify Student
+                                        </asp:LinkButton>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
                             </Columns>
                         </asp:GridView>
                     </div>

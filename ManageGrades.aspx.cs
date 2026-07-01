@@ -7,24 +7,6 @@ namespace StudentManagementSystem
 {
     public partial class ManageGrades : System.Web.UI.Page
     {
-        private string GetProfilePictureUrl(int lecturerID)
-        {
-            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
-            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
-            string imageUrl = "~/Uploads/ProfilePictures/default.png";
-
-            foreach (string ext in extensions)
-            {
-                string filePath = System.IO.Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
-                if (System.IO.File.Exists(filePath))
-                {
-                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
-                    break;
-                }
-            }
-            return imageUrl;
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Lecturer")
@@ -35,9 +17,11 @@ namespace StudentManagementSystem
 
             if (!IsPostBack)
             {
-                lblUserName.Text = Session["UserName"].ToString();
-                int lecturerID = Convert.ToInt32(Session["UserID"]);
-                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(lecturerID);
+                // UI Fix: Added assignment for both username labels present in your HTML
+                string userName = Session["UserName"]?.ToString() ?? "Lecturer";
+                lblUserName.Text = userName;
+                lblTopUserName.Text = userName;
+
                 LoadLecturerCourses();
             }
         }
@@ -49,7 +33,6 @@ namespace StudentManagementSystem
 
             DataTable dt = new DataTable();
 
-            // Bypass DbHelper.ExecuteQuery and use standard ADO.NET
             using (SqlConnection conn = DbHelper.GetConnection())
             using (SqlCommand cmd = new SqlCommand(sql, conn))
             {
@@ -79,20 +62,20 @@ namespace StudentManagementSystem
 
         private void LoadStudentsForCourse(int courseId)
         {
-            // Join ENROLMENT and STUDENT to get list, LEFT JOIN RESULT to get any saved draft marks
+            // Added r.publishedStatus to the SELECT statement
             string sql = @"
-                SELECT s.studentID, s.studentCode, s.name AS studentName,
-                       ISNULL(r.marks * 0.3, 0) AS assignmentMarks, 
-                       ISNULL(r.marks * 0.3, 0) AS midtermMarks,
-                       ISNULL(r.marks * 0.4, 0) AS finalMarks
-                FROM ENROLMENT e
-                INNER JOIN STUDENT s ON e.studentID = s.studentID
-                LEFT JOIN RESULT r ON e.studentID = r.studentID AND e.courseID = r.courseID
-                WHERE e.courseID = @courseID AND e.status = 'enrolled'";
+        SELECT s.studentID, s.studentCode, s.name AS studentName,
+               ISNULL(r.marks * 0.3, 0) AS assignmentMarks, 
+               ISNULL(r.marks * 0.3, 0) AS midtermMarks,
+               ISNULL(r.marks * 0.4, 0) AS finalMarks,
+               ISNULL(r.publishedStatus, 'Draft') AS publishedStatus
+        FROM ENROLMENT e
+        INNER JOIN STUDENT s ON e.studentID = s.studentID
+        LEFT JOIN RESULT r ON e.studentID = r.studentID AND e.courseID = r.courseID
+        WHERE e.courseID = @courseID AND e.status = 'enrolled'";
 
             DataTable dt = new DataTable();
 
-            // Bypass DbHelper.ExecuteQuery and use standard ADO.NET
             using (SqlConnection conn = DbHelper.GetConnection())
             using (SqlCommand cmd = new SqlCommand(sql, conn))
             {
@@ -106,7 +89,6 @@ namespace StudentManagementSystem
             rptStudents.DataSource = dt;
             rptStudents.DataBind();
         }
-
         // ==========================================
         // ACTION 1: SAVE DRAFT
         // ==========================================
@@ -125,6 +107,16 @@ namespace StudentManagementSystem
             ShowStatus("Marks Published successfully! Notifications sent to students.", "bg-success");
         }
 
+        // ==========================================
+        // ACTION 3: LOGOUT (FIXES COMPILATION ERROR)
+        // ==========================================
+        protected void btnLogout_Click(object sender, EventArgs e)
+        {
+            Session.Clear();
+            Session.Abandon();
+            Response.Redirect("Login.aspx");
+        }
+
         private void SaveMarksToDatabase(string status)
         {
             int courseId = Convert.ToInt32(ddlCourses.SelectedValue);
@@ -140,10 +132,8 @@ namespace StudentManagementSystem
                 decimal totalMarks = string.IsNullOrEmpty(hfTotal.Value) ? 0 : Convert.ToDecimal(hfTotal.Value);
                 string grade = string.IsNullOrEmpty(hfGrade.Value) ? "F" : hfGrade.Value;
 
-                // Calculate GPA utilizing standard logic
                 decimal gpaPoint = CalculateGPAValue(totalMarks);
 
-                // UPSERT Logic (Update if exists, Insert if new)
                 string sqlResult = @"
                     IF EXISTS (SELECT 1 FROM RESULT WHERE studentID = @sID AND courseID = @cID)
                     BEGIN
@@ -173,7 +163,6 @@ namespace StudentManagementSystem
                     cmd.ExecuteNonQuery();
                 }
 
-                // If Publishing, insert the required NOTIFICATION row
                 if (status == "Published")
                 {
                     CreateNotification(studentId, ddlCourses.SelectedItem.Text, grade);

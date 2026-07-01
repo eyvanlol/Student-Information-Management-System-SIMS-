@@ -11,24 +11,17 @@
         :root { --sidebar-width: 260px; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
 
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: linear-gradient(180deg,#1a1a2e 0%,#16213e 100%); color: white; z-index: 1000; overflow-y: auto; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; background: linear-gradient(180deg,#1a1a2e 0%,#16213e 100%); color: white; z-index: 1000; overflow-y: auto; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-avatar {
-            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 10px;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-        .sidebar-avatar img {
-            width: 70px; height: 70px; object-fit: cover; border-radius: 50%;
-            display: block;
-        }
+        .sidebar-header .logo { width: 70px; height: 70px; background: linear-gradient(135deg,#9b59b6,#8e44ad); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
         .sidebar-header h4 { font-size: 1rem; margin-bottom: 3px; }
         .sidebar-header small { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 14px 25px; display: flex; align-items: center; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
         .nav-link:hover, .nav-link.active { background: rgba(155,89,182,0.15); color: white; border-left-color: #9b59b6; }
         .nav-link i { width: 25px; font-size: 1rem; margin-right: 12px; }
         .nav-link span { font-size: 0.9rem; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar nav { flex: 1 1 auto; overflow-y: auto; }
+        .sidebar-footer { margin-top: auto; flex-shrink: 0; width: 100%; padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
         .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
@@ -72,12 +65,7 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-avatar">
-                <asp:Image ID="imgSidebarAvatar" runat="server" 
-                    Width="70" Height="70"
-                    ImageUrl="~/Uploads/ProfilePictures/default.png" 
-                    AlternateText="Avatar" />
-            </div>
+            <div class="logo"><i class="fas fa-chalkboard-teacher"></i></div>
             <h4><asp:Label ID="lblUserName" runat="server"></asp:Label></h4>
             <small>Lecturer Portal</small>
         </div>
@@ -149,7 +137,7 @@
                             <Columns>
                                 <asp:BoundField DataField="studentCode" HeaderText="Student ID" />
                                 <asp:BoundField DataField="name" HeaderText="Student Name" />
-
+        
                                 <asp:TemplateField HeaderText="Attendance Score">
                                     <ItemTemplate>
                                         <strong><%# Eval("attendanceRate") %>%</strong>

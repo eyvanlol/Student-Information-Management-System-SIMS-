@@ -6,24 +6,6 @@ namespace StudentManagementSystem
 {
     public partial class LecturerStudentProgress : System.Web.UI.Page
     {
-        private string GetProfilePictureUrl(int lecturerID)
-        {
-            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
-            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
-            string imageUrl = "~/Uploads/ProfilePictures/default.png";
-
-            foreach (string ext in extensions)
-            {
-                string filePath = System.IO.Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
-                if (System.IO.File.Exists(filePath))
-                {
-                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
-                    break;
-                }
-            }
-            return imageUrl;
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
             // Security Check
@@ -39,7 +21,6 @@ namespace StudentManagementSystem
                 lblTopUserName.Text = Session["UserName"].ToString();
 
                 int lecturerID = Convert.ToInt32(Session["UserID"]);
-                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(lecturerID);
                 LoadCourseTabs(lecturerID);
 
                 // Check if a course was clicked (e.g., ?courseID=1)

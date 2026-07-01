@@ -123,5 +123,196 @@ namespace StudentManagementSystem
 </div>";
             Send(toPersonalEmail, subject, body);
         }
+
+        /// <summary>
+        /// TASK 1 — Fail / Retake notification to a student's PERSONAL email.
+        /// Reuses the same private Send() (and therefore the same Web.config SMTP
+        /// settings) as the OTP/welcome mail, so no new email mechanism is added.
+        ///
+        ///   statusLabel        : "Failed" or "Must Retake"
+        ///   marksGrade         : display string, e.g. "42.00 (F)"
+        ///   retakeInstruction  : free-text guidance shown in the body
+        /// Throws on delivery failure so the caller can show the real reason.
+        /// </summary>
+        public static void SendResultNotification(
+            string toPersonalEmail,
+            string studentName,
+            string courseCode,
+            string courseName,
+            string statusLabel,
+            string marksGrade,
+            string retakeInstruction)
+        {
+            // Red header for "Failed", amber for "Must Retake".
+            bool isRetake = string.Equals(statusLabel, "Must Retake", StringComparison.OrdinalIgnoreCase);
+            string headerBg = isRetake
+                ? "linear-gradient(135deg,#e67e22,#d35400)"
+                : "linear-gradient(135deg,#e74c3c,#c0392b)";
+            string accent = isRetake ? "#d35400" : "#c0392b";
+
+            string subject = $"SIMS result notice — {courseCode} ({statusLabel})";
+            string body = $@"
+<div style='font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:auto;color:#2c3e50;'>
+  <div style='background:{headerBg};padding:22px 28px;border-radius:12px 12px 0 0;color:#fff;'>
+    <h2 style='margin:0;font-size:1.3rem;'>Result Notification</h2>
+    <p style='margin:4px 0 0;opacity:.9;'>Student Information Management System</p>
+  </div>
+  <div style='border:1px solid #eee;border-top:none;padding:28px;border-radius:0 0 12px 12px;'>
+    <p>Dear {studentName},</p>
+    <p>This is an official notice from the Head of Programme regarding your result for the
+       following course:</p>
+    <table style='width:100%;border-collapse:collapse;margin:18px 0;font-size:.95rem;'>
+      <tr><td style='padding:8px 0;color:#7f8c8d;'>Course</td><td style='padding:8px 0;font-weight:600;'>{courseCode} — {courseName}</td></tr>
+      <tr><td style='padding:8px 0;color:#7f8c8d;'>Result</td><td style='padding:8px 0;font-weight:600;'>{marksGrade}</td></tr>
+      <tr><td style='padding:8px 0;color:#7f8c8d;'>Status</td>
+          <td style='padding:8px 0;font-weight:700;color:{accent};'>{statusLabel}</td></tr>
+    </table>
+    <div style='background:#f4f6f9;border-left:4px solid {accent};border-radius:6px;padding:14px 16px;margin:14px 0;'>
+      <strong>What you need to do</strong>
+      <p style='margin:8px 0 0;font-size:.9rem;'>{retakeInstruction}</p>
+    </div>
+    <p style='font-size:.85rem;color:#7f8c8d;margin-top:18px;'>
+      If you believe this is an error, please contact the Head of Programme as soon as possible.
+    </p>
+    <p style='font-size:.8rem;color:#b0b7bd;'>This is an automated message from SIMS Registry.</p>
+  </div>
+</div>";
+            Send(toPersonalEmail, subject, body);
+        }
+
+        /// <summary>
+        /// FIX 3 — sent immediately when a student creates a personal calendar
+        /// alert. Confirms the alert and echoes the description back.
+        /// </summary>
+        public static void SendReminderConfirmation(
+            string toPersonalEmail, string studentName, string title,
+            string description, DateTime startTime)
+        {
+            string subject = "Alert set: " + title;
+            string desc = string.IsNullOrEmpty(description) ? "(no description)" : description;
+            string body = $@"
+<div style='font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:auto;color:#2c3e50;'>
+  <div style='background:linear-gradient(135deg,#3498db,#2980b9);padding:22px 28px;border-radius:12px 12px 0 0;color:#fff;'>
+    <h2 style='margin:0;font-size:1.3rem;'>Calendar alert created</h2>
+  </div>
+  <div style='border:1px solid #eee;border-top:none;padding:28px;border-radius:0 0 12px 12px;'>
+    <p>Hi {studentName},</p>
+    <p>You have created the following personal alert in SIMS:</p>
+    <table style='width:100%;border-collapse:collapse;margin:18px 0;font-size:.95rem;'>
+      <tr><td style='padding:8px 0;color:#7f8c8d;'>Title</td><td style='padding:8px 0;font-weight:600;'>{title}</td></tr>
+      <tr><td style='padding:8px 0;color:#7f8c8d;'>When</td><td style='padding:8px 0;font-weight:600;'>{startTime:dddd, d MMM yyyy h:mm tt}</td></tr>
+      <tr><td style='padding:8px 0;color:#7f8c8d;vertical-align:top;'>Details</td><td style='padding:8px 0;'>{desc}</td></tr>
+    </table>
+    <p style='font-size:.85rem;color:#7f8c8d;'>We will email you a reminder about one hour before it starts.</p>
+  </div>
+</div>";
+            Send(toPersonalEmail, subject, body);
+        }
+
+        /// <summary>
+        /// FIX 3 — sent by the background ReminderService about an hour before
+        /// the alert's start time.
+        /// </summary>
+        public static void SendReminderDueSoon(
+            string toPersonalEmail, string studentName, string title,
+            string description, DateTime startTime)
+        {
+            string subject = "Reminder (starts soon): " + title;
+            string desc = string.IsNullOrEmpty(description) ? "(no description)" : description;
+            string body = $@"
+<div style='font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:auto;color:#2c3e50;'>
+  <div style='background:linear-gradient(135deg,#e67e22,#d35400);padding:22px 28px;border-radius:12px 12px 0 0;color:#fff;'>
+    <h2 style='margin:0;font-size:1.3rem;'>Starting soon</h2>
+  </div>
+  <div style='border:1px solid #eee;border-top:none;padding:28px;border-radius:0 0 12px 12px;'>
+    <p>Hi {studentName},</p>
+    <p>This is a reminder that your alert <strong>{title}</strong> begins at
+       <strong>{startTime:h:mm tt}</strong> ({startTime:dddd, d MMM yyyy}).</p>
+    <div style='background:#f4f6f9;border-left:4px solid #d35400;border-radius:6px;padding:14px 16px;margin:14px 0;'>
+      <strong>Your note</strong>
+      <p style='margin:8px 0 0;font-size:.9rem;'>{desc}</p>
+    </div>
+  </div>
+</div>";
+            Send(toPersonalEmail, subject, body);
+        }
+
+        /// <summary>
+        /// FIX 4 — attendance warning / barring / drop letter (INTI style).
+        /// level: 1 = first warning (&lt;80%), 2 = second warning + barred from
+        /// final (&lt;60%), 3 = dropped (&lt;40%).
+        /// </summary>
+        public static void SendAttendanceWarningLetter(
+            string toPersonalEmail, string studentName, string programmeName,
+            string courseCode, string courseName, int percent,
+            int attended, int totalSessions, int level)
+        {
+            int absent = totalSessions - attended;
+            string heading, levelLine, headerBg, accent;
+            if (level >= 3)
+            {
+                heading = "ENROLMENT DROPPED DUE TO ABSENTEEISM";
+                levelLine = "Your attendance has fallen below 40%. In line with the attendance policy, " +
+                            "you have been AUTOMATICALLY DROPPED from this course.";
+                headerBg = "linear-gradient(135deg,#c0392b,#7b241c)"; accent = "#7b241c";
+            }
+            else if (level == 2)
+            {
+                heading = "SECOND WARNING LETTER DUE TO ABSENTEEISM";
+                levelLine = "This is your SECOND warning. Your attendance is below 60%. You will be " +
+                            "BARRED from taking the final examination / submitting the final coursework " +
+                            "for this module unless your attendance improves.";
+                headerBg = "linear-gradient(135deg,#e74c3c,#c0392b)"; accent = "#c0392b";
+            }
+            else
+            {
+                heading = "FIRST WARNING LETTER DUE TO ABSENTEEISM";
+                levelLine = "This is your FIRST warning. Your attendance is below the required 80%. " +
+                            "Please attend all remaining classes to avoid being barred.";
+                headerBg = "linear-gradient(135deg,#e67e22,#d35400)"; accent = "#d35400";
+            }
+
+            string subject = $"WARNING LETTER — {courseCode} ({percent}% attendance)";
+            string body = $@"
+<div style='font-family:Segoe UI,Arial,sans-serif;max-width:620px;margin:auto;color:#2c3e50;'>
+  <div style='background:{headerBg};padding:22px 28px;border-radius:12px 12px 0 0;color:#fff;'>
+    <h2 style='margin:0;font-size:1.25rem;'>{heading}</h2>
+    <p style='margin:4px 0 0;opacity:.9;'>Student Information Management System</p>
+  </div>
+  <div style='border:1px solid #eee;border-top:none;padding:28px;border-radius:0 0 12px 12px;'>
+    <p>Dear {studentName},</p>
+    <p style='font-weight:600;'>{programmeName}</p>
+    <p>According to the attendance records, your attendance for the following course is below
+       the required threshold:</p>
+    <table style='width:100%;border-collapse:collapse;margin:14px 0;font-size:.9rem;'>
+      <tr style='background:#f8f9fa;'>
+        <th style='border:1px solid #e0e0e0;padding:8px;text-align:left;'>Course</th>
+        <th style='border:1px solid #e0e0e0;padding:8px;'>Sessions Held</th>
+        <th style='border:1px solid #e0e0e0;padding:8px;'>Attended</th>
+        <th style='border:1px solid #e0e0e0;padding:8px;'>Absent</th>
+        <th style='border:1px solid #e0e0e0;padding:8px;'>Attendance %</th>
+      </tr>
+      <tr>
+        <td style='border:1px solid #e0e0e0;padding:8px;'>{courseCode} — {courseName}</td>
+        <td style='border:1px solid #e0e0e0;padding:8px;text-align:center;'>{totalSessions}</td>
+        <td style='border:1px solid #e0e0e0;padding:8px;text-align:center;'>{attended}</td>
+        <td style='border:1px solid #e0e0e0;padding:8px;text-align:center;'>{absent}</td>
+        <td style='border:1px solid #e0e0e0;padding:8px;text-align:center;font-weight:700;color:{accent};'>{percent}%</td>
+      </tr>
+    </table>
+    <div style='background:#f4f6f9;border-left:4px solid {accent};border-radius:6px;padding:14px 16px;margin:14px 0;'>
+      <p style='margin:0;font-size:.92rem;'>{levelLine}</p>
+    </div>
+    <p style='font-size:.86rem;color:#555;'>
+      Policy: a student must meet a minimum of 80% attendance. Failing which, you may be barred
+      from the final examination or final coursework. Please see your Head of Programme as soon
+      as possible if you are facing difficulties causing the absenteeism.
+    </p>
+    <p style='font-size:.8rem;color:#b0b7bd;'>This is an automated letter from SIMS Registry.</p>
+  </div>
+</div>";
+            Send(toPersonalEmail, subject, body);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentEnrolment.aspx.cs" Inherits="StudentManagementSystem.StudentEnrolment" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentEnrolment.aspx.cs" Inherits="StudentManagementSystem.StudentEnrolment" %>
+<%@ Register Src="~/NotificationBell.ascx" TagPrefix="uc" TagName="NotificationBell" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -142,10 +143,7 @@
         <div class="topbar">
             <h2><i class="fas fa-clipboard-list me-2" style="color:#1abc9c;"></i>My Enrolment</h2>
             <div class="topbar-actions">
-                <div class="notification-bell" style="cursor:pointer;" onclick="location.href='StudentNotifications.aspx'" title="View notifications">
-                    <i class="fas fa-bell text-muted"></i>
-                    <span class="badge"><asp:Label ID="lblBellCount" runat="server" Text="0"></asp:Label></span>
-                </div>
+                <uc:NotificationBell runat="server" ID="ucNotificationBell" />
                 <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:35px;height:35px;background:linear-gradient(135deg,#1abc9c,#16a085);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;">
                             <i class="fas fa-user"></i>
@@ -312,11 +310,11 @@
 <script>
     window.onload = function () {
     var msg = document.getElementById('<%= lblMessage.ClientID %>');
-    if (msg !== null && msg.innerText.trim() !== '') {
-        msg.style.display = 'block';
-        setTimeout(function () { msg.style.display = 'none'; }, 5000);
-    }
-};
+        if (msg !== null && msg.innerText.trim() !== '') {
+            msg.style.display = 'block';
+            setTimeout(function () { msg.style.display = 'none'; }, 5000);
+        }
+    };
 </script>
 </body>
 </html>

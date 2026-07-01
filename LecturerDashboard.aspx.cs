@@ -1,32 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Data;
 using System.Data.SqlClient;
-using DocumentFormat.OpenXml.Drawing;
 
 namespace StudentManagementSystem
 {
     public partial class LecturerDashboard : System.Web.UI.Page
     {
-        private string GetProfilePictureUrl(int lecturerID)
-        {
-            string uploadPath = Server.MapPath("~/Uploads/ProfilePictures/");
-            string[] extensions = { ".jpg", ".jpeg", ".png", ".gif" };
-            string imageUrl = "~/Uploads/ProfilePictures/default.png";
-
-            foreach (string ext in extensions)
-            {
-                string filePath = System.IO.Path.Combine(uploadPath, "lecturer_" + lecturerID + ext);
-                if (System.IO.File.Exists(filePath))
-                {
-                    imageUrl = "~/Uploads/ProfilePictures/lecturer_" + lecturerID + ext + "?v=" + DateTime.Now.Ticks;
-                    break;
-                }
-            }
-            return imageUrl;
-        }
-
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Lecturer")
@@ -50,7 +29,6 @@ namespace StudentManagementSystem
 
                 if (!IsPostBack)
                     LoadDashboard();
-                imgSidebarAvatar.ImageUrl = GetProfilePictureUrl(Convert.ToInt32(Session["UserID"]));
             }
         }
 
@@ -72,20 +50,26 @@ namespace StudentManagementSystem
                 new SqlParameter("@id", lecturerID));
             lblStudentCount.Text = studentCount?.ToString() ?? "0";
 
-            // Stat 3: Avg attendance
+            // Stat 3: Avg attendance (Fixed to use c.lecturerID)
             object avgAtt = DbHelper.ExecuteScalar(
                 @"SELECT ISNULL(CAST(
                     COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0)
-                  AS INT),0) FROM ATTENDANCE a WHERE a.lecturerID = @id",
+                  AS INT),0) 
+                  FROM ATTENDANCE a 
+                  INNER JOIN COURSE c ON a.courseID = c.courseID 
+                  WHERE c.lecturerID = @id",
                 new SqlParameter("@id", lecturerID));
             lblAvgAttendance.Text = (avgAtt?.ToString() ?? "0") + "%";
 
-            // Stat 4: At-risk count
+            // Stat 4: At-risk count (Fixed to < 80 and c.lecturerID)
             object atRiskCount = DbHelper.ExecuteScalar(
                 @"SELECT COUNT(*) FROM (
-                    SELECT a.studentID, a.courseID FROM ATTENDANCE a WHERE a.lecturerID = @id
+                    SELECT a.studentID, a.courseID 
+                    FROM ATTENDANCE a 
+                    INNER JOIN COURSE c ON a.courseID = c.courseID 
+                    WHERE c.lecturerID = @id
                     GROUP BY a.studentID, a.courseID
-                    HAVING COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) < 85
+                    HAVING CAST(COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) AS DECIMAL(5,1)) < 80
                   ) x",
                 new SqlParameter("@id", lecturerID));
             lblAtRiskCount.Text = atRiskCount?.ToString() ?? "0";
@@ -102,16 +86,16 @@ namespace StudentManagementSystem
             rptCourses.DataSource = dtCourses;
             rptCourses.DataBind();
 
-            // At-Risk Students
+            // At-Risk Students List (Fixed to < 80 and c.lecturerID)
             DataTable dtAtRisk = DbHelper.ExecuteQuery(
                 @"SELECT s.name, c.courseCode,
                          CAST(COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) AS DECIMAL(5,1)) AS attendanceRate
                   FROM ATTENDANCE a
-                  INNER JOIN STUDENT s ON a.studentID=s.studentID
-                  INNER JOIN COURSE  c ON a.courseID =c.courseID
-                  WHERE a.lecturerID=@id
+                  INNER JOIN STUDENT s ON a.studentID = s.studentID
+                  INNER JOIN COURSE  c ON a.courseID = c.courseID
+                  WHERE c.lecturerID = @id
                   GROUP BY s.name, c.courseCode
-                  HAVING CAST(COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) AS DECIMAL(5,1)) < 85
+                  HAVING CAST(COUNT(CASE WHEN a.status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) AS DECIMAL(5,1)) < 80
                   ORDER BY attendanceRate ASC",
                 new SqlParameter("@id", lecturerID));
             rptAtRisk.DataSource = dtAtRisk;
@@ -130,40 +114,61 @@ namespace StudentManagementSystem
             rptGrades.DataSource = dtGrades;
             rptGrades.DataBind();
 
-            // Weekly Attendance — % per day of week from last 30 days
-            DataTable dtWeekly = DbHelper.ExecuteQuery(
-                @"SELECT
-                    DATEPART(WEEKDAY, attendanceDate) AS dayNum,
-                    DATENAME(WEEKDAY, attendanceDate) AS dayName,
-                    CAST(COUNT(CASE WHEN status='Present' THEN 1 END)*100.0/NULLIF(COUNT(*),0) AS INT) AS pct
-                  FROM ATTENDANCE
-                  WHERE lecturerID = @id
-                    AND attendanceDate >= DATEADD(DAY,-30,GETDATE())
-                  GROUP BY DATEPART(WEEKDAY,attendanceDate), DATENAME(WEEKDAY,attendanceDate)
-                  ORDER BY dayNum",
-                new SqlParameter("@id", lecturerID));
+            // Weekly attendance (auto-refreshes to the current week)
+            LoadWeeklyAttendance();
+        }
 
-            // Map day name -> pct for the 5 bars
-            int monPct = 0, tuePct = 0, wedPct = 0, thuPct = 0, friPct = 0;
-            foreach (DataRow row in dtWeekly.Rows)
+        private void LoadWeeklyAttendance()
+        {
+            // Default all bars to 0 so the page never crashes if a day has no classes
+            hfMon.Value = "0";
+            hfTue.Value = "0";
+            hfWed.Value = "0";
+            hfThu.Value = "0";
+            hfFri.Value = "0";
+
+            try
             {
-                string day = row["dayName"].ToString().Substring(0, 3);
-                int pct = Convert.ToInt32(row["pct"]);
-                switch (day)
+                int lecturerID = Convert.ToInt32(Session["UserID"]);
+
+                // Current week: Monday 00:00 up to (but not including) the following Saturday → covers Mon–Fri
+                DateTime today = DateTime.Today;
+                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                DateTime monday = today.AddDays(-diff).Date;
+                DateTime saturday = monday.AddDays(5).Date;
+
+                DataTable dtWeekly = DbHelper.ExecuteQuery(
+                    @"SELECT DATENAME(WEEKDAY, a.attendanceDate) AS dayName,
+                             CAST(ROUND(100.0 * SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END)
+                                  / NULLIF(COUNT(*),0), 0) AS INT) AS pct
+                      FROM ATTENDANCE a
+                      INNER JOIN COURSE c ON a.courseID = c.courseID
+                      WHERE c.lecturerID = @id
+                        AND a.attendanceDate >= @monday
+                        AND a.attendanceDate <  @saturday
+                      GROUP BY DATENAME(WEEKDAY, a.attendanceDate)",
+                    new SqlParameter("@id", lecturerID),
+                    new SqlParameter("@monday", monday),
+                    new SqlParameter("@saturday", saturday));
+
+                foreach (DataRow row in dtWeekly.Rows)
                 {
-                    case "Mon": monPct = pct; break;
-                    case "Tue": tuePct = pct; break;
-                    case "Wed": wedPct = pct; break;
-                    case "Thu": thuPct = pct; break;
-                    case "Fri": friPct = pct; break;
+                    string day = row["dayName"].ToString();
+                    string pct = row["pct"].ToString();
+                    switch (day)
+                    {
+                        case "Monday": hfMon.Value = pct; break;
+                        case "Tuesday": hfTue.Value = pct; break;
+                        case "Wednesday": hfWed.Value = pct; break;
+                        case "Thursday": hfThu.Value = pct; break;
+                        case "Friday": hfFri.Value = pct; break;
+                    }
                 }
             }
-
-            hfMon.Value = monPct.ToString();
-            hfTue.Value = tuePct.ToString();
-            hfWed.Value = wedPct.ToString();
-            hfThu.Value = thuPct.ToString();
-            hfFri.Value = friPct.ToString();
+            catch
+            {
+                hfMon.Value = "0"; hfTue.Value = "0"; hfWed.Value = "0"; hfThu.Value = "0"; hfFri.Value = "0";
+            }
         }
 
         protected void btnViewProgress_Click(object sender, EventArgs e)
