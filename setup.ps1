@@ -25,21 +25,56 @@ if ($PSScriptRoot -like "*OneDrive*") {
 }
 
 # 1. Visual Studio (provides MSBuild, IIS Express and SQL Server LocalDB)
-$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$haveVS = (Test-Path $vswhere) -and (& $vswhere -latest -requires Microsoft.VisualStudio.Workload.NetWeb -property installationPath)
-if ($haveVS) {
+$vsDir     = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
+$vswhere   = Join-Path $vsDir 'vswhere.exe'
+$vsSetup   = Join-Path $vsDir 'setup.exe'
+$parts     = '--add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.Net.Component.4.7.2.TargetingPack --add Microsoft.VisualStudio.Component.SQL.LocalDB.Runtime --includeRecommended'
+
+function Explain-InstallCode($code) {
+  switch ($code) {
+    { $_ -in 0, 3010 } { return $null }   # success (3010 = restart later)
+    8006    { "Visual Studio or the Visual Studio Installer is still open. Close them (check the taskbar and the icons near the clock), or restart the PC, then run this script again." }
+    1001    { "Another Visual Studio install or update is already running. Wait for it to finish, then run this script again." }
+    { $_ -in 1602, 5004 } { "The install was cancelled (the admin prompt was declined or closed). Run this script again and click Yes." }
+    740     { "The installer needs admin rights. Run this script again and click Yes on the admin prompt." }
+    default { "The Visual Studio installer stopped with code $code. Restart the PC and run this script again. If it keeps failing, install 'ASP.NET and web development' from the Visual Studio Installer yourself." }
+  }
+}
+
+$haveWeb = (Test-Path $vswhere) -and (& $vswhere -latest -requires Microsoft.VisualStudio.Workload.NetWeb -property installationPath)
+$anyVS   = if (Test-Path $vswhere) { & $vswhere -latest -property installationPath } else { $null }
+
+if ($haveWeb) {
   Step "Visual Studio with ASP.NET is already installed"
 } else {
-  Step "Installing Visual Studio 2022 Community (click YES on the admin prompt; takes 20-40 min)"
-  if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Done-Fail "winget isn't available. Install Visual Studio 2022 Community yourself with the 'ASP.NET and web development' workload, then run this again."
+  # The installer refuses to run while Visual Studio is open (error 8006)
+  while (Get-Process devenv, vs_installer, vs_installershell -ErrorAction SilentlyContinue) {
+    Write-Host "Please close Visual Studio and the Visual Studio Installer first." -ForegroundColor Yellow
+    Read-Host "Press Enter when they're closed"
   }
-  winget install --id Microsoft.VisualStudio.2022.Community --exact --source winget `
-    --accept-package-agreements --accept-source-agreements `
-    --override "--passive --wait --norestart --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.Net.Component.4.7.2.TargetingPack --add Microsoft.VisualStudio.Component.SQL.LocalDB.Runtime --includeRecommended"
-  if ($LASTEXITCODE -ne 0) {
-    Done-Fail "Visual Studio install did not finish (code $LASTEXITCODE). If you clicked No on the admin prompt, run this script again."
+
+  if ($anyVS -and (Test-Path $vsSetup)) {
+    # Visual Studio exists but is missing the ASP.NET part: add it instead of reinstalling
+    Step "Adding 'ASP.NET and web development' to your Visual Studio (click YES on the admin prompt; takes 10-30 min)"
+    $p = Start-Process $vsSetup -ArgumentList "modify --installPath `"$anyVS`" $parts --passive --norestart" -Verb RunAs -Wait -PassThru
+    $code = $p.ExitCode
+  } else {
+    Step "Installing Visual Studio 2022 Community (click YES on the admin prompt; takes 20-40 min)"
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+      Done-Fail "winget isn't available. Install Visual Studio 2022 Community yourself with the 'ASP.NET and web development' workload, then run this again."
+    }
+    winget install --id Microsoft.VisualStudio.2022.Community --exact --source winget `
+      --accept-package-agreements --accept-source-agreements `
+      --override "--passive --wait --norestart $parts" 2>&1 | Tee-Object -Variable wingetOut
+    $code = $LASTEXITCODE
+    # winget reports its own code; the installer's real code is in its output
+    $m = [regex]::Match(($wingetOut | Out-String), 'exit code:\s*(\d+)')
+    if ($m.Success) { $code = [int]$m.Groups[1].Value }
   }
+
+  $why = Explain-InstallCode $code
+  if ($why) { Done-Fail $why }
+
   # pick up sqllocaldb on PATH in this window
   $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
 }
