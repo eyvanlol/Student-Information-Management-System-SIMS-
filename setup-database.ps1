@@ -1,7 +1,8 @@
 # Builds SIMS_DB on SQL Server LocalDB from the scripts in this folder.
 # Usage (PowerShell, in this folder):   .\setup-database.ps1
 # If scripts are blocked:               powershell -ExecutionPolicy Bypass -File .\setup-database.ps1
-param([string]$Server = '(localdb)\MSSQLLocalDB')
+#   -ResetPasswords   set every account's password to Test@123 and activate all students
+param([string]$Server = '(localdb)\MSSQLLocalDB', [switch]$ResetPasswords)
 
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
@@ -47,6 +48,35 @@ try {
       }
     }
   }
-  Write-Host "`nSIMS_DB is ready. Test logins (password Test@123):" -ForegroundColor Green
-  Write-Host "  admin@sims.edu, lecturer@sims.edu, student1@sims.edu, student2@sims.edu"
+  Write-Host "`nSIMS_DB is ready." -ForegroundColor Green
+
+  # Optional: make every account usable locally (password Test@123, students activated)
+  if ($ResetPasswords) {
+    foreach ($t in 'HOP_ADMIN','LECTURER','STUDENT') {
+      $cmd = $conn.CreateCommand(); $cmd.CommandText = "UPDATE $t SET password = 'Test@123'"
+      Write-Host ("Reset {0} {1} password(s) to Test@123" -f $cmd.ExecuteNonQuery(), $t)
+    }
+    $cmd = $conn.CreateCommand(); $cmd.CommandText = "UPDATE STUDENT SET isActivated = 1, otpCode = NULL WHERE isActivated = 0"
+    Write-Host ("Activated {0} student account(s) (no email code needed)" -f $cmd.ExecuteNonQuery())
+  }
+
+  # List who can log in. The login form takes the email + password.
+  # Passwords stored as a hash can't be shown: run with -ResetPasswords to set them all to Test@123.
+  $hashed = $false
+  foreach ($t in @(@('HOP_ADMIN','Admin'), @('LECTURER','Lecturer'), @('STUDENT','Student'))) {
+    $extra = if ($t[0] -eq 'STUDENT') { ", isActivated" } else { ", CAST(1 AS BIT) AS isActivated" }
+    $cmd = $conn.CreateCommand(); $cmd.CommandText = "SELECT email, password $extra FROM $($t[0]) ORDER BY email"
+    $r = $cmd.ExecuteReader()
+    Write-Host "`n  $($t[1]) logins:" -ForegroundColor Green
+    while ($r.Read()) {
+      $p = "$($r['password'])"
+      if ($p.Length -ge 40) { $p = '(hidden - stored as a hash)'; $hashed = $true }
+      $note = if ($r['isActivated'] -eq $false) { '  [first login asks for an emailed code]' } else { '' }
+      Write-Host ("    {0,-32} password: {1}{2}" -f $r['email'], $p, $note)
+    }
+    $r.Close()
+  }
+  Write-Host ""
+  Write-Host "  Accounts this setup created use the password Test@123." -ForegroundColor Green
+  if ($hashed) { Write-Host "  Forgot a hidden password? Run:  powershell -ExecutionPolicy Bypass -File .\setup.ps1 -ResetPasswords" -ForegroundColor Yellow }
 } finally { $conn.Close() }

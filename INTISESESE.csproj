@@ -125,7 +125,6 @@
     <Content Include="ManageGrades.aspx" />
     <Content Include="ManageProgrammes.aspx" />
     <Content Include="ManageUsers.aspx" />
-    <Content Include="RecentSE.csproj.user" />
     <Content Include="RegisterLecturer.aspx" />
     <Content Include="RegisterStudent.aspx" />
     <Content Include="Reports.aspx" />
@@ -384,7 +383,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="README.md" />
-    <Content Include="RecentSE.csproj" />
     <Content Include="SQL CODE  UPDATED" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
