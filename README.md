@@ -14,11 +14,21 @@
 
 ## Log in
 
-Password: **`Test@123`**
+Password for every account: **`Test@123`**
+
+**New database** (made by the setup):
 
 - Admin: `admin@sims.edu`
 - Lecturer: `lecturer@sims.edu`
 - Student: `student1@sims.edu`
+
+**Team database** (if you already had SIMS_DB):
+
+- Admin: `admin@college.edu`
+- Lecturer: `l9@staff.sims.edu`
+- Student: `ahmad.farid@sims.edu`
+
+The setup also lists all the emails you can use at the end.
 
 ## Can't log in?
 
