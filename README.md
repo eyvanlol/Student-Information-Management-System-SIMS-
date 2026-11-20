@@ -27,3 +27,11 @@ Run this the same way as step 2. It sets every password to `Test@123`:
 ```
 powershell -ExecutionPolicy Bypass -File .\setup.ps1 -ResetPasswords
 ```
+
+## Database errors?
+
+Start with a clean database. This **deletes** your old SIMS_DB:
+
+```
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -FreshDatabase
+```

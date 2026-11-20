@@ -2,7 +2,8 @@
 # Usage (PowerShell, in this folder):   .\setup-database.ps1
 # If scripts are blocked:               powershell -ExecutionPolicy Bypass -File .\setup-database.ps1
 #   -ResetPasswords   set every account's password to Test@123 and activate all students
-param([string]$Server = '(localdb)\MSSQLLocalDB', [switch]$ResetPasswords)
+#   -FreshDatabase    DELETE the existing SIMS_DB first and build a clean one with sample data
+param([string]$Server = '(localdb)\MSSQLLocalDB', [switch]$ResetPasswords, [switch]$FreshDatabase)
 
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
@@ -27,6 +28,18 @@ $conn = New-Object System.Data.SqlClient.SqlConnection("Server=$Server;Database=
 $conn.add_InfoMessage({ param($s, $e) Write-Host "    $($e.Message)" -ForegroundColor DarkGray })
 $conn.Open()
 try {
+  if ($FreshDatabase) {
+    $cmd = $conn.CreateCommand(); $cmd.CommandText = "SELECT DB_ID('SIMS_DB')"
+    if ($cmd.ExecuteScalar() -isnot [DBNull]) {
+      Write-Host "`n-FreshDatabase will permanently DELETE the existing SIMS_DB and everything in it." -ForegroundColor Yellow
+      if ((Read-Host "Type YES to delete it") -ne 'YES') { Write-Host "Cancelled - nothing was deleted."; exit 1 }
+      $cmd = $conn.CreateCommand()
+      $cmd.CommandText = "ALTER DATABASE SIMS_DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE SIMS_DB;"
+      [void]$cmd.ExecuteNonQuery()
+      Write-Host "Old SIMS_DB deleted." -ForegroundColor Green
+    }
+  }
+
   $first = $true
   foreach ($f in $files) {
     Write-Host "== $f" -ForegroundColor Cyan

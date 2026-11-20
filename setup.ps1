@@ -11,8 +11,9 @@
 #
 # Options:
 #   -ResetPasswords   also set every account's password to Test@123
+#   -FreshDatabase    DELETE the existing SIMS_DB and start clean (asks you to type YES)
 
-param([switch]$ResetPasswords)
+param([switch]$ResetPasswords, [switch]$FreshDatabase)
 
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
@@ -100,7 +101,7 @@ if ($haveWeb) {
 
 # 2. Database
 Step "Building the SIMS_DB database"
-& (Join-Path $PSScriptRoot 'setup-database.ps1') -ResetPasswords:$ResetPasswords
+& (Join-Path $PSScriptRoot 'setup-database.ps1') -ResetPasswords:$ResetPasswords -FreshDatabase:$FreshDatabase
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { Done-Fail "Database setup failed - see the red text above." }
 
 # 3. Open the solution

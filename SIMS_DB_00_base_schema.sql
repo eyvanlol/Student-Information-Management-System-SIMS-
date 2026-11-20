@@ -202,9 +202,27 @@ GO
 
 -- =====================================================================
 -- SEED DATA (base columns only). Password hash below = Base64(SHA-256("Test@123")).
+-- Sample data is added ONLY to a brand-new database. If SIMS_DB already held
+-- any people or courses the first time this ran, nothing is added (the sample
+-- rows use fixed IDs that would clash with existing data).
 -- =====================================================================
 
-IF NOT EXISTS (SELECT 1 FROM dbo.PROGRAMME)
+IF OBJECT_ID('dbo.SIMS_SETUP_INFO', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SIMS_SETUP_INFO (seedSampleData BIT NOT NULL, createdAt DATETIME NOT NULL DEFAULT GETDATE());
+    INSERT INTO dbo.SIMS_SETUP_INFO (seedSampleData)
+    SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.HOP_ADMIN)
+                 AND NOT EXISTS (SELECT 1 FROM dbo.LECTURER)
+                 AND NOT EXISTS (SELECT 1 FROM dbo.STUDENT)
+                 AND NOT EXISTS (SELECT 1 FROM dbo.COURSE)
+                 AND NOT EXISTS (SELECT 1 FROM dbo.ENROLMENT)
+                THEN 1 ELSE 0 END;
+    IF EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 0)
+        PRINT 'SIMS_DB already has data - keeping it and skipping the sample data.';
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.PROGRAMME) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.PROGRAMME ON;
     INSERT INTO dbo.PROGRAMME (programmeID, programmeName, programmeCode, faculty, totalCredits, durationYears, status)
@@ -214,7 +232,7 @@ END
 GO
 
 -- adminID 1 is required: PATCH 3 updates adminID 1, PATCH 5 seeds createdBy = 1.
-IF NOT EXISTS (SELECT 1 FROM dbo.HOP_ADMIN)
+IF NOT EXISTS (SELECT 1 FROM dbo.HOP_ADMIN) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.HOP_ADMIN ON;
     INSERT INTO dbo.HOP_ADMIN (adminID, name, email, password)
@@ -223,7 +241,7 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM dbo.LECTURER)
+IF NOT EXISTS (SELECT 1 FROM dbo.LECTURER) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.LECTURER ON;
     INSERT INTO dbo.LECTURER (lecturerID, name, email, password)
@@ -233,7 +251,7 @@ END
 GO
 
 -- personalEmail uses the reserved example.com domain so any app email goes nowhere real.
-IF NOT EXISTS (SELECT 1 FROM dbo.STUDENT)
+IF NOT EXISTS (SELECT 1 FROM dbo.STUDENT) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.STUDENT ON;
     INSERT INTO dbo.STUDENT (studentID, name, email, password, programmeID, personalEmail, studentCode) VALUES
@@ -244,7 +262,7 @@ END
 GO
 
 -- Course codes/names match the NOTIFICATION rows PATCH 6 seeds for student 1.
-IF NOT EXISTS (SELECT 1 FROM dbo.COURSE)
+IF NOT EXISTS (SELECT 1 FROM dbo.COURSE) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.COURSE ON;
     INSERT INTO dbo.COURSE (courseID, programmeID, lecturerID, courseName, courseCode, creditHour, description, semester, maxCapacity, status) VALUES
@@ -258,7 +276,7 @@ GO
 
 -- Semester 'AUGUST 2026' / '2026/2027' = the session PATCH 5 seeds as 'Open'.
 -- enrolmentID supplied explicitly (PATCH 12 trigger does not exist yet).
-IF NOT EXISTS (SELECT 1 FROM dbo.ENROLMENT)
+IF NOT EXISTS (SELECT 1 FROM dbo.ENROLMENT) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
     INSERT INTO dbo.ENROLMENT (enrolmentID, studentID, courseID, semester, academicYear, enrolDate, status) VALUES
     ('1', 1, 1, 'AUGUST 2026', '2026/2027', '2026-06-15', 'enrolled'),
     ('2', 1, 2, 'AUGUST 2026', '2026/2027', '2026-06-15', 'enrolled'),
@@ -269,7 +287,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.ENROLMENT)
 GO
 
 -- Student 1 attends well; student 2 is below 80% in DCS101 (shows on At-Risk pages).
-IF NOT EXISTS (SELECT 1 FROM dbo.ATTENDANCE)
+IF NOT EXISTS (SELECT 1 FROM dbo.ATTENDANCE) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
     INSERT INTO dbo.ATTENDANCE (studentID, courseID, lecturerID, attendanceDate, sessionType, status) VALUES
     (1, 1, 1, '2026-08-03', 'Lecture', 'Present'),
     (1, 1, 1, '2026-08-06', 'Lecture', 'Present'),
@@ -287,14 +305,14 @@ IF NOT EXISTS (SELECT 1 FROM dbo.ATTENDANCE)
 GO
 
 -- Rows with publishedDate become 'Published' in PATCH 7; NULL publishedDate -> 'Draft'.
-IF NOT EXISTS (SELECT 1 FROM dbo.RESULT)
+IF NOT EXISTS (SELECT 1 FROM dbo.RESULT) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
     INSERT INTO dbo.RESULT (studentID, courseID, lecturerID, semester, marks, grade, GPA, remarks, publishedDate) VALUES
     (1, 1, 1, '1', 78.50, 'B+', 3.33, NULL, '2026-10-30'),            -- published pass
     (2, 1, 1, '1', 45.00, 'F',  0.00, NULL, '2026-10-30'),            -- published fail (Results & Retake tab)
     (1, 2, 1, '1', 70.00, 'B+', 3.33, NULL, NULL);                    -- draft
 GO
 
-IF NOT EXISTS (SELECT 1 FROM dbo.ACADEMIC_CALENDAR)
+IF NOT EXISTS (SELECT 1 FROM dbo.ACADEMIC_CALENDAR) AND EXISTS (SELECT 1 FROM dbo.SIMS_SETUP_INFO WHERE seedSampleData = 1)
     INSERT INTO dbo.ACADEMIC_CALENDAR (eventName, eventType, startDate, endDate, academicYear, affects, createdBy) VALUES
     (N'Final Examinations', 'Exam',    '2026-12-07', '2026-12-18', '2026/2027', 'All', 1),
     (N'Semester Break',     'Holiday', '2026-12-21', '2027-01-03', '2026/2027', 'All', 1);

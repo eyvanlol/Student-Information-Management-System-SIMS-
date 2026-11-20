@@ -148,10 +148,11 @@ BEGIN
         CONSTRAINT fk_session_admin   FOREIGN KEY (createdBy) REFERENCES HOP_ADMIN(adminID)
     );
 
+    DECLARE @seedAdmin INT = (SELECT MIN(adminID) FROM HOP_ADMIN);
     INSERT INTO SEMESTER_SESSION (semesterName, academicYear, semesterType, enrolStartDate, enrolEndDate, classStartDate, status, createdBy) VALUES
-    ('JANUARY 2026', '2025/2026', 'Short', '2025-12-01', '2025-12-20', '2026-01-05', 'Closed', 1),
-    ('APRIL 2026',   '2025/2026', 'Long',  '2026-03-01', '2026-03-31', '2026-04-07', 'Closed', 1),
-    ('AUGUST 2026',  '2026/2027', 'Long',  '2026-06-01', '2026-06-30', '2026-08-03', 'Open',   1);
+    ('JANUARY 2026', '2025/2026', 'Short', '2025-12-01', '2025-12-20', '2026-01-05', 'Closed', @seedAdmin),
+    ('APRIL 2026',   '2025/2026', 'Long',  '2026-03-01', '2026-03-31', '2026-04-07', 'Closed', @seedAdmin),
+    ('AUGUST 2026',  '2026/2027', 'Long',  '2026-06-01', '2026-06-30', '2026-08-03', 'Open',   @seedAdmin);
 
     PRINT 'SEMESTER_SESSION created and seeded.';
 END
