@@ -19,8 +19,10 @@ IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'STUD
 GO
 
 -- Add unique constraint on studentCode if not exists
+-- (filtered index: many rows may still have no code yet, and NULLs must not count as duplicates)
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'STUDENT' AND CONSTRAINT_NAME = 'uq_student_code')
-    ALTER TABLE STUDENT ADD CONSTRAINT uq_student_code UNIQUE (studentCode);
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'uq_student_code' AND object_id = OBJECT_ID('STUDENT'))
+    CREATE UNIQUE INDEX uq_student_code ON STUDENT(studentCode) WHERE studentCode IS NOT NULL;
 GO
 
 -- Update existing seed students
@@ -48,13 +50,15 @@ IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'LECT
 GO
 
 -- Add unique constraint on lecturerCode if not exists
+-- (filtered index: many rows may still have no code yet, and NULLs must not count as duplicates)
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'LECTURER' AND CONSTRAINT_NAME = 'uq_lecturer_code')
-    ALTER TABLE LECTURER ADD CONSTRAINT uq_lecturer_code UNIQUE (lecturerCode);
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'uq_lecturer_code' AND object_id = OBJECT_ID('LECTURER'))
+    CREATE UNIQUE INDEX uq_lecturer_code ON LECTURER(lecturerCode) WHERE lecturerCode IS NOT NULL;
 GO
 
 -- Add check constraint on staffType if not exists
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'LECTURER' AND CONSTRAINT_NAME = 'chk_staff_type')
-    ALTER TABLE LECTURER ADD CONSTRAINT chk_staff_type CHECK (staffType IN ('Full-time','Part-time'));
+    ALTER TABLE LECTURER WITH NOCHECK ADD CONSTRAINT chk_staff_type CHECK (staffType IN ('Full-time','Part-time'));
 GO
 
 -- Update existing seed lecturers
@@ -72,8 +76,10 @@ IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'HOP_
     ALTER TABLE HOP_ADMIN ADD adminCode VARCHAR(20) NULL;
 GO
 
+-- (filtered index: many rows may still have no code yet, and NULLs must not count as duplicates)
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'HOP_ADMIN' AND CONSTRAINT_NAME = 'uq_admin_code')
-    ALTER TABLE HOP_ADMIN ADD CONSTRAINT uq_admin_code UNIQUE (adminCode);
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'uq_admin_code' AND object_id = OBJECT_ID('HOP_ADMIN'))
+    CREATE UNIQUE INDEX uq_admin_code ON HOP_ADMIN(adminCode) WHERE adminCode IS NOT NULL;
 GO
 
 UPDATE HOP_ADMIN SET adminCode = 'ADM2604001' WHERE adminID = 1 AND adminCode IS NULL;
@@ -108,7 +114,8 @@ GO
 
 -- Step 4: Add CHECK constraint for allowed status values
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'ENROLMENT' AND CONSTRAINT_NAME = 'chk_enrolment_status')
-    ALTER TABLE ENROLMENT ADD CONSTRAINT chk_enrolment_status CHECK (status IN (
+    -- WITH NOCHECK: don't fail on older rows that used other status words
+    ALTER TABLE ENROLMENT WITH NOCHECK ADD CONSTRAINT chk_enrolment_status CHECK (status IN (
         'pending',
         'enrolled',
         'drop_requested',
@@ -405,14 +412,19 @@ GO
 
 
 
-ALTER TABLE ENROLMENT ALTER COLUMN semester VARCHAR(30) NOT NULL;
+-- Widen ENROLMENT.semester to fit names like 'AUGUST 2026'. Make it NOT NULL only
+-- when no existing row has a NULL semester; otherwise just widen it.
+IF EXISTS (SELECT 1 FROM ENROLMENT WHERE semester IS NULL)
+    ALTER TABLE ENROLMENT ALTER COLUMN semester VARCHAR(30) NULL;
+ELSE
+    ALTER TABLE ENROLMENT ALTER COLUMN semester VARCHAR(30) NOT NULL;
 GO
 
 -- Allow notifications addressed to admins (used by student drop requests)
 IF OBJECT_ID('chk_notif_role', 'C') IS NOT NULL
     ALTER TABLE NOTIFICATION DROP CONSTRAINT chk_notif_role;
 
-ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_role
+ALTER TABLE NOTIFICATION WITH NOCHECK ADD CONSTRAINT chk_notif_role
 CHECK (recipientRole IN ('student','lecturer','admin','all'));
 GO
 
