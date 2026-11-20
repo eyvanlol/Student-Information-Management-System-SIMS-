@@ -42,9 +42,9 @@ function Explain-InstallCode($code) {
   }
 }
 
-$haveWeb = (Test-Path $vswhere) -and (& $vswhere -latest -requires Microsoft.VisualStudio.Workload.NetWeb -property installationPath)
+$haveWeb = (Test-Path $vswhere) -and (& $vswhere -latest -prerelease -requires Microsoft.VisualStudio.Workload.NetWeb -property installationPath)
 # -all also finds installs that didn't finish (those need "resume" before they can be changed)
-$vsInfo  = if (Test-Path $vswhere) { & $vswhere -all -latest -format json | Out-String | ConvertFrom-Json | Select-Object -First 1 } else { $null }
+$vsInfo  = if (Test-Path $vswhere) { & $vswhere -all -latest -prerelease -format json | Out-String | ConvertFrom-Json | Select-Object -First 1 } else { $null }
 $anyVS   = if ($vsInfo) { $vsInfo.installationPath } else { $null }
 
 if ($haveWeb) {
@@ -69,6 +69,13 @@ if ($haveWeb) {
       Step "Adding 'ASP.NET and web development' to your Visual Studio (click YES on the admin prompt; takes 10-30 min)"
       $p = Start-Process $vsSetup -ArgumentList "modify --installPath `"$anyVS`" $parts --passive --norestart" -Verb RunAs -Wait -PassThru
       $code = $p.ExitCode
+      # Newer/preview Visual Studio versions may not know one of the extra parts:
+      # retry with just the ASP.NET workload (it brings IIS Express and LocalDB)
+      if ((Explain-InstallCode $code) -and $code -notin 8006, 1001, 1602, 5004, 740) {
+        Step "Retrying with just 'ASP.NET and web development'"
+        $p = Start-Process $vsSetup -ArgumentList "modify --installPath `"$anyVS`" --add Microsoft.VisualStudio.Workload.NetWeb --includeRecommended --passive --norestart" -Verb RunAs -Wait -PassThru
+        $code = $p.ExitCode
+      }
     }
   } else {
     Step "Installing Visual Studio 2022 Community (click YES on the admin prompt; takes 20-40 min)"
