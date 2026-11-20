@@ -37,12 +37,15 @@ function Explain-InstallCode($code) {
     1001    { "Another Visual Studio install or update is already running. Wait for it to finish, then run this script again." }
     { $_ -in 1602, 5004 } { "The install was cancelled (the admin prompt was declined or closed). Run this script again and click Yes." }
     740     { "The installer needs admin rights. Run this script again and click Yes on the admin prompt." }
+    { $_ -in -1978335189, -1978335135 } { "Windows says Visual Studio 2022 is already installed, but it isn't working properly (probably an install that didn't finish). Open 'Visual Studio Installer' from the Start menu: click Resume or Repair if you see it, then click Modify, tick 'ASP.NET and web development' and click Modify. Then run this script again." }
     default { "The Visual Studio installer stopped with code $code. Restart the PC and run this script again. If it keeps failing, install 'ASP.NET and web development' from the Visual Studio Installer yourself." }
   }
 }
 
 $haveWeb = (Test-Path $vswhere) -and (& $vswhere -latest -requires Microsoft.VisualStudio.Workload.NetWeb -property installationPath)
-$anyVS   = if (Test-Path $vswhere) { & $vswhere -latest -property installationPath } else { $null }
+# -all also finds installs that didn't finish (those need "resume" before they can be changed)
+$vsInfo  = if (Test-Path $vswhere) { & $vswhere -all -latest -format json | Out-String | ConvertFrom-Json | Select-Object -First 1 } else { $null }
+$anyVS   = if ($vsInfo) { $vsInfo.installationPath } else { $null }
 
 if ($haveWeb) {
   Step "Visual Studio with ASP.NET is already installed"
@@ -54,10 +57,19 @@ if ($haveWeb) {
   }
 
   if ($anyVS -and (Test-Path $vsSetup)) {
-    # Visual Studio exists but is missing the ASP.NET part: add it instead of reinstalling
-    Step "Adding 'ASP.NET and web development' to your Visual Studio (click YES on the admin prompt; takes 10-30 min)"
-    $p = Start-Process $vsSetup -ArgumentList "modify --installPath `"$anyVS`" $parts --passive --norestart" -Verb RunAs -Wait -PassThru
-    $code = $p.ExitCode
+    $code = 0
+    if ($vsInfo.isComplete -eq $false) {
+      # A previous install stopped halfway: finish it first
+      Step "Finishing an earlier Visual Studio install that didn't complete (click YES on the admin prompt)"
+      $p = Start-Process $vsSetup -ArgumentList "resume --installPath `"$anyVS`" --passive --norestart" -Verb RunAs -Wait -PassThru
+      $code = $p.ExitCode
+    }
+    if ((Explain-InstallCode $code) -eq $null) {
+      # Visual Studio exists but is missing the ASP.NET part: add it instead of reinstalling
+      Step "Adding 'ASP.NET and web development' to your Visual Studio (click YES on the admin prompt; takes 10-30 min)"
+      $p = Start-Process $vsSetup -ArgumentList "modify --installPath `"$anyVS`" $parts --passive --norestart" -Verb RunAs -Wait -PassThru
+      $code = $p.ExitCode
+    }
   } else {
     Step "Installing Visual Studio 2022 Community (click YES on the admin prompt; takes 20-40 min)"
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
