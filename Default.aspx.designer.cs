@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Viva5
+namespace StudentManagementSystem
 {
 
 

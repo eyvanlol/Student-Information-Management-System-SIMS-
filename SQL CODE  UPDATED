@@ -193,7 +193,8 @@ BEGIN
         CONSTRAINT chk_result_published CHECK (publishedStatus IN ('Draft','Published'));
 
     -- Set existing results to Published since they already have publishedDate
-    UPDATE RESULT SET publishedStatus = 'Published' WHERE publishedDate IS NOT NULL;
+    -- (EXEC so SQL Server doesn't reject the brand-new column name when compiling this batch)
+    EXEC('UPDATE RESULT SET publishedStatus = ''Published'' WHERE publishedDate IS NOT NULL;');
 
     PRINT 'publishedStatus added to RESULT.';
 END
@@ -405,12 +406,15 @@ GO
 
 
 ALTER TABLE ENROLMENT ALTER COLUMN semester VARCHAR(30) NOT NULL;
-CHECK (recipientRole IN ('student','lecturer','all'))
+GO
 
-ALTER TABLE NOTIFICATION DROP CONSTRAINT chk_notif_role;
+-- Allow notifications addressed to admins (used by student drop requests)
+IF OBJECT_ID('chk_notif_role', 'C') IS NOT NULL
+    ALTER TABLE NOTIFICATION DROP CONSTRAINT chk_notif_role;
 
-ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_role 
+ALTER TABLE NOTIFICATION ADD CONSTRAINT chk_notif_role
 CHECK (recipientRole IN ('student','lecturer','admin','all'));
+GO
 
 
 

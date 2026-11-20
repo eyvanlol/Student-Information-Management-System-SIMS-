@@ -353,7 +353,7 @@ namespace StudentManagementSystem
                          MAX(recipientRole)  AS recipientRole,
                          MAX(createdAt)      AS createdAt,
                          COUNT(*)            AS recipientCount,
-                         ISNULL(groupKey, CAST(MIN(notificationID) AS VARCHAR)) AS groupKey
+                         ISNULL(groupKey, CAST(notificationID AS VARCHAR)) AS groupKey
                 FROM     NOTIFICATION
                 WHERE    notifType = 'announcement'
                 {where}

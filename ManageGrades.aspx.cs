@@ -119,6 +119,7 @@ namespace StudentManagementSystem
 
         private void SaveMarksToDatabase(string status)
         {
+            if (string.IsNullOrEmpty(ddlCourses.SelectedValue)) return;
             int courseId = Convert.ToInt32(ddlCourses.SelectedValue);
             int lecturerId = Convert.ToInt32(Session["UserID"]);
 
@@ -207,4 +208,4 @@ namespace StudentManagementSystem
             lblStatus.Visible = true;
         }
     }
-}
+}

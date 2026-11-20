@@ -144,8 +144,46 @@
     <Content Include="StudentProfile.aspx" />
     <Content Include="AtRiskStudents.aspx" />
     <Content Include="LecturerStudentProgress.aspx" />
+    <Content Include="Default.aspx" />
+    <Content Include="Global.asax" />
+    <Content Include="NotificationBell.ascx" />
+    <Content Include="FinalResultProcessing.aspx" />
+    <Content Include="StudentCalendar.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="NotificationBell.ascx.cs">
+      <DependentUpon>NotificationBell.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="NotificationBell.ascx.designer.cs">
+      <DependentUpon>NotificationBell.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="FinalResultProcessing.aspx.cs">
+      <DependentUpon>FinalResultProcessing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FinalResultProcessing.aspx.designer.cs">
+      <DependentUpon>FinalResultProcessing.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="StudentCalendar.aspx.cs">
+      <DependentUpon>StudentCalendar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="StudentCalendar.aspx.designer.cs">
+      <DependentUpon>StudentCalendar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ProgressionService.cs" />
+    <Compile Include="ReminderService.cs" />
     <Compile Include="AcademicCalendar.aspx.cs">
       <DependentUpon>AcademicCalendar.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -247,7 +285,6 @@
       <DependentUpon>ManageUsers.aspx</DependentUpon>
     </Compile>
     <Compile Include="NotificationHelper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterLecturer.aspx.cs">
       <DependentUpon>RegisterLecturer.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

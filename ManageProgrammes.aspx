@@ -247,6 +247,9 @@
                                     <div class="col-6 mb-3">
                                         <label class="form-label">Duration (Yrs) <span class="req">*</span></label>
                                         <asp:TextBox ID="txtDuration" runat="server" CssClass="form-control" TextMode="Number" />
+                                        <asp:RequiredFieldValidator ID="rfvDuration" runat="server" ControlToValidate="txtDuration"
+                                            ValidationGroup="prog" CssClass="text-danger small" Display="Dynamic"
+                                            ErrorMessage="Duration is required." />
                                         <asp:RangeValidator ID="rngDuration" runat="server" ControlToValidate="txtDuration"
                                             ValidationGroup="prog" CssClass="text-danger small" Display="Dynamic"
                                             Type="Integer" MinimumValue="1" MaximumValue="10" ErrorMessage="1-10 only." />

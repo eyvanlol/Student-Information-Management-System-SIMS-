@@ -59,7 +59,7 @@ namespace StudentManagementSystem
                     r.grade
                 FROM RESULT r
                 INNER JOIN COURSE c ON r.courseID = c.courseID
-                WHERE r.studentID = @studentID
+                WHERE r.studentID = @studentID AND r.publishedStatus = 'Published'
                 ORDER BY r.semester ASC, c.courseCode ASC";
 
             gvResults.DataSource = GetData(sql, studentID);

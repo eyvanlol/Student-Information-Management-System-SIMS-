@@ -334,7 +334,7 @@ namespace StudentManagementSystem
                 return; // ignore the GridView's built-in commands (paging/sorting)
 
             int enrolmentId = Convert.ToInt32(e.CommandArgument);
-            string newStatus = e.CommandName == "ApproveRow" ? "dropped" : "rejected";
+            string newStatus = e.CommandName == "ApproveRow" ? "dropped" : "enrolled"; // rejected = student stays in the course
             string notifType = e.CommandName == "ApproveRow" ? "drop_approved" : "drop_rejected";
             string notifTitle = e.CommandName == "ApproveRow"
                 ? "Drop request approved"
